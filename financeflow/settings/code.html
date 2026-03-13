@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d968b",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102220",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Settings - FinancePro</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex min-h-screen">
+<!-- Side Navigation -->
+<aside class="w-64 border-r border-primary/10 bg-white dark:bg-background-dark/50 hidden md:flex flex-col shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-tight">FinancePro</h1>
+<p class="text-xs text-primary font-medium">Premium Plan</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-sm font-medium">Transactions</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-sm font-medium">Budgets</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-primary/10">
+<div class="flex items-center gap-3 p-2">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-800 bg-cover bg-center" data-alt="User profile avatar circle" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuARf0WYpdgESKFpk-fxdq-qpw1YxQycb_yHsT_nDO4lvIQ_6_35MoxXwitbyW2CFLAy_SdLYB-QveE_dS5KEedw7RZeDJ_HvYFmsdHxyMCE76OiDJoLXq1mofZAgGsqjMOqYoprR7Hay5FPChuwJpCSXjKze0JjAg5STphbDSGf07Q-yFxRJHLXtXUUL7Dy7K10G9TCv2CKEorm0iPrRdd2fW-tFH9pAWwARn1Kwre9BqIU90FKdcWa_k0mReNHU2P3x0l12o7cm2g')"></div>
+<div class="flex flex-col overflow-hidden">
+<p class="text-xs font-bold truncate">John Doe</p>
+<p class="text-[10px] text-slate-500 truncate">john@finance.pro</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Header -->
+<header class="p-8 pb-4">
+<h1 class="text-3xl font-black tracking-tight mb-2">Settings</h1>
+<p class="text-slate-500 dark:text-slate-400">Manage your financial workspace, security, and preferences.</p>
+</header>
+<!-- Tabs Navigation -->
+<div class="px-8 border-b border-primary/10 flex gap-8">
+<button class="py-4 text-sm font-bold border-b-2 border-primary text-primary">Profile</button>
+<button class="py-4 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-primary transition-colors">Categories</button>
+<button class="py-4 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-primary transition-colors">Security</button>
+<button class="py-4 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-primary transition-colors">Data Export</button>
+</div>
+<!-- Content Area -->
+<div class="p-8 space-y-12 max-w-4xl">
+<!-- Profile Section -->
+<section>
+<h2 class="text-xl font-bold mb-6">Profile Information</h2>
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-primary/5 shadow-sm">
+<div class="flex flex-col md:flex-row gap-8 items-start">
+<div class="flex flex-col items-center gap-4 shrink-0">
+<div class="size-24 rounded-full bg-primary/10 border-4 border-white dark:border-slate-800 shadow-xl flex items-center justify-center overflow-hidden">
+<div class="w-full h-full bg-cover bg-center" data-alt="Large user profile avatar for settings" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCNFUrzKEFUCl13b6G-4fXsSmsM33sAzj2O_hR6JIE8dk5WYz4l4rDAu1TxbiYIqIxFFLUKzzN5aAcAPhi9FgyIxsU1MugICJ36iGDD1390Udu6i_P4kj4-DNBcNWdQZd87zrqIm-hsU0PiDfdDR5sjDD5T6SDpYDPsuiR1rjy3tK1yUwtYHFvM6toGhh-VxGsL-49gneuqVAlbYPPmc9gbHxVeKMG9947ItX_SAwd3qeBIihvUwNz4BamJ80llcGRcqW5Vrx25rpI')"></div>
+</div>
+<button class="text-xs font-bold text-primary hover:underline">Change Photo</button>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Name</label>
+<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="text" value="John Doe"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Address</label>
+<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="email" value="john.doe@example.com"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Default Currency</label>
+<select class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm">
+<option>USD ($)</option>
+<option>EUR (€)</option>
+<option>GBP (£)</option>
+<option>JPY (¥)</option>
+</select>
+</div>
+<div class="flex items-end">
+<button class="bg-primary text-white text-sm font-bold px-6 py-2.5 rounded-lg hover:brightness-110 transition-all w-full md:w-auto">Save Changes</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Category Management -->
+<section>
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold">Category Management</h2>
+<button class="text-sm font-bold text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+                            Add Category
+                        </button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<p class="text-sm font-bold">Dining &amp; Food</p>
+<p class="text-[10px] text-slate-500 uppercase">Expense</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">palette</span></button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">edit</span></button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div>
+<p class="text-sm font-bold">Transportation</p>
+<p class="text-[10px] text-slate-500 uppercase">Expense</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">palette</span></button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">edit</span></button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="text-sm font-bold">Salary &amp; Bonus</p>
+<p class="text-[10px] text-slate-500 uppercase">Income</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">palette</span></button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">edit</span></button>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-primary/5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<p class="text-sm font-bold">Shopping</p>
+<p class="text-[10px] text-slate-500 uppercase">Expense</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">palette</span></button>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400"><span class="material-symbols-outlined text-xl">edit</span></button>
+</div>
+</div>
+</div>
+</section>
+<!-- Security Section -->
+<section>
+<h2 class="text-xl font-bold mb-6">Security Settings</h2>
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-primary/5 shadow-sm">
+<form class="space-y-4 max-w-md">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Current Password</label>
+<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="password"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">New Password</label>
+<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="password"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Confirm New Password</label>
+<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="password"/>
+</div>
+<button class="bg-primary/10 text-primary text-sm font-bold px-6 py-2.5 rounded-lg hover:bg-primary/20 transition-all" type="button">Update Password</button>
+</form>
+</div>
+</section>
+<!-- Data Export Section -->
+<section>
+<h2 class="text-xl font-bold mb-6">Export Your Data</h2>
+<div class="bg-white dark:bg-slate-900 rounded-xl p-8 border border-primary/5 shadow-sm">
+<div class="flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="space-y-1">
+<p class="text-base font-bold">Download financial records</p>
+<p class="text-sm text-slate-500">Get a full history of your transactions and categories in your preferred format.</p>
+</div>
+<div class="flex flex-wrap gap-4">
+<button class="flex items-center gap-2 px-6 py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined">csv</span>
+                                    Export as CSV
+                                </button>
+<button class="flex items-center gap-2 px-6 py-3 border-2 border-slate-900 dark:border-slate-100 text-slate-900 dark:text-slate-100 font-bold rounded-xl hover:bg-slate-900 hover:text-white dark:hover:bg-slate-100 dark:hover:text-slate-900 transition-all">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+                                    Export as PDF
+                                </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="pb-12">
+<div class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-xl p-6">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4">
+<div>
+<h3 class="text-lg font-bold text-red-600">Delete Account</h3>
+<p class="text-sm text-red-500">Once you delete your account, there is no going back. Please be certain.</p>
+</div>
+<button class="px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all text-sm">Delete Forever</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

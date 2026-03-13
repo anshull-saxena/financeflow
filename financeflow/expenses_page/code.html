@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Expense Tracking - FinancePro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d968b",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102220",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="flex min-h-screen">
+<!-- Side Navigation -->
+<aside class="w-64 bg-white dark:bg-slate-900 border-r border-primary/10 flex flex-col fixed h-full">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-slate-900 dark:text-white leading-none">FinancePro</h1>
+<p class="text-xs text-primary font-medium uppercase tracking-wider">Manager</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary text-white rounded-lg shadow-sm shadow-primary/20" href="#">
+<span class="material-symbols-outlined text-fill">receipt_long</span>
+<span class="font-medium">Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-medium">Budgets</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">savings</span>
+<span class="font-medium">Savings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-medium">Reports</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-primary/10">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-4 py-2">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+<img alt="User profile" data-alt="User profile circular avatar image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlUigwR8sThuwUOXWyV5J2v586lRuto8aAOFXJwBwzatF1al9D-A8_KPCeNiHGa10YZBgTGLEYc3wfB3pgEvAbvdbKYJCfdpz28PS-SeGIBWu_04QLVhZf99R7Y2qYLdUn4iQyT4R39tMKFbQxVUgztlKFLkcLOJTXeBkpO6nw67o-JS0mgp6LNvURmOgRZKVFD-QS7jKtTcRu_Ft6Nscw3numKk0OTXauyfbT5oLR4lOf20rAWd0TbuYPfcaByF0Wp2fRhR9tW9w"/>
+</div>
+<div class="text-sm">
+<p class="font-semibold text-slate-900 dark:text-white">Alex Rivera</p>
+<p class="text-xs text-slate-500">Premium Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 flex-1 p-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Expense Tracking</h2>
+<p class="text-slate-500 mt-1">Manage and categorize your daily spending.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-primary/25">
+<span class="material-symbols-outlined">add</span>
+<span>Add New Expense</span>
+</button>
+</div>
+<!-- Summary Card -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+<div class="col-span-1 lg:col-span-2 relative overflow-hidden bg-primary rounded-xl p-8 text-white flex items-center justify-between">
+<div class="relative z-10">
+<p class="text-primary-foreground/80 text-sm font-medium uppercase tracking-widest mb-1">Monthly Overview</p>
+<h3 class="text-lg font-bold opacity-90">Total Expenses this Month</h3>
+<div class="flex items-baseline gap-2 mt-4">
+<span class="text-4xl font-black">$3,450.00</span>
+<span class="text-sm font-medium bg-white/20 px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_down</span>
+                            12%
+                        </span>
+</div>
+</div>
+<div class="hidden md:block absolute right-[-20px] top-[-20px] opacity-10">
+<span class="material-symbols-outlined text-[200px]">payments</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-center">
+<p class="text-slate-500 text-sm font-medium">Daily Average</p>
+<h4 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">$115.00</h4>
+<div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-4">
+<div class="bg-primary h-2 rounded-full w-2/3"></div>
+</div>
+<p class="text-xs text-slate-500 mt-2">65% of daily budget spent</p>
+</div>
+</div>
+<!-- Filters -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm mb-6">
+<div class="flex flex-wrap items-center gap-4">
+<div class="flex-1 min-w-[200px]">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Date Range</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">calendar_today</span>
+<select class="w-full pl-10 pr-4 py-2.5 bg-background-light dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 cursor-pointer">
+<option>Last 30 Days</option>
+<option>This Month</option>
+<option>Last Quarter</option>
+<option>Custom Range</option>
+</select>
+</div>
+</div>
+<div class="flex-1 min-w-[200px]">
+<label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 px-1">Category</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">category</span>
+<select class="w-full pl-10 pr-4 py-2.5 bg-background-light dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/50 cursor-pointer">
+<option>All Categories</option>
+<option>Food &amp; Dining</option>
+<option>Bills &amp; Utilities</option>
+<option>Shopping</option>
+<option>Transportation</option>
+<option>Entertainment</option>
+</select>
+</div>
+</div>
+<div class="flex-none self-end pb-0.5">
+<button class="px-6 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                        Clear Filters
+                    </button>
+</div>
+</div>
+</div>
+<!-- Data Table -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Category</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Amount</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">Oct 24, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">restaurant</span>
+</div>
+<span class="text-sm font-semibold">Food</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Whole Foods Grocery</td>
+<td class="px-6 py-4 whitespace-nowrap font-bold text-slate-900 dark:text-white">$142.30</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-400">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1.5 hover:text-red-500 transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">Oct 22, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">bolt</span>
+</div>
+<span class="text-sm font-semibold">Bills</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Electric Utility Bill</td>
+<td class="px-6 py-4 whitespace-nowrap font-bold text-slate-900 dark:text-white">$85.00</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-400">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1.5 hover:text-red-500 transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">Oct 20, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">shopping_bag</span>
+</div>
+<span class="text-sm font-semibold">Shopping</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Amazon - Home Decor</td>
+<td class="px-6 py-4 whitespace-nowrap font-bold text-slate-900 dark:text-white">$210.50</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-400">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1.5 hover:text-red-500 transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">Oct 19, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">directions_car</span>
+</div>
+<span class="text-sm font-semibold">Travel</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Fuel Station</td>
+<td class="px-6 py-4 whitespace-nowrap font-bold text-slate-900 dark:text-white">$65.00</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-400">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1.5 hover:text-red-500 transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group border-b-0">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">Oct 18, 2023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">movie</span>
+</div>
+<span class="text-sm font-semibold">Fun</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">Netflix Subscription</td>
+<td class="px-6 py-4 whitespace-nowrap font-bold text-slate-900 dark:text-white">$18.99</td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-slate-400">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-1.5 hover:text-red-500 transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
+<p class="text-sm text-slate-500">Showing 5 of 128 transactions</p>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

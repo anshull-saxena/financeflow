@@ -1,0 +1,196 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#00eeff",
+            "background-light": "#f5f8f8",
+            "background-dark": "#0a0f16",
+          },
+          fontFamily: {
+            "display": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mesh-gradient {
+      background-color: #0a0f16;
+      background-image:
+        radial-gradient(at 0% 0%, rgba(0, 238, 255, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.15) 0px, transparent 50%);
+    }
+
+    .neon-glow-primary {
+      box-shadow: 0 0 15px rgba(0, 238, 255, 0.3);
+    }
+
+    .neon-glow-red {
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 mesh-gradient min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-20 lg:w-64 glass border-r border-white/10 flex flex-col h-full z-20">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center neon-glow-primary">
+<span class="material-symbols-outlined text-background-dark font-bold">account_balance_wallet</span>
+</div>
+<span class="hidden lg:block text-xl font-extrabold tracking-tight text-white">FinanceFlow</span>
+</div>
+<nav class="flex-1 px-4 mt-6 space-y-2">
+<a class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all text-slate-400 hover:bg-white/5 hover:text-white" href="dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="hidden lg:block font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all text-slate-400 hover:bg-white/5 hover:text-white" href="income.html">
+<span class="material-symbols-outlined">payments</span>
+<span class="hidden lg:block font-medium">Income</span>
+</a>
+<a class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all text-slate-400 hover:bg-white/5 hover:text-white" href="expenses.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="hidden lg:block font-medium">Expenses</span>
+</a>
+<a class="flex items-center gap-4 px-3 py-3 rounded-xl transition-all bg-primary/10 text-primary border border-primary/20 neon-glow-primary" href="settings.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="hidden lg:block font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<button class="w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all text-slate-400 hover:bg-red-500/10 hover:text-red-400">
+<span class="material-symbols-outlined text-red-500">logout</span>
+<span class="hidden lg:block font-medium">Sign Out</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto p-8 lg:p-12">
+<div class="max-w-5xl mx-auto space-y-10">
+<!-- Header -->
+<div class="flex flex-col gap-1">
+<h1 class="text-4xl font-extrabold text-white tracking-tight">Settings</h1>
+<p class="text-slate-400">Manage your premium experience and security preferences.</p>
+</div>
+<!-- Layout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- 1. Profile Card -->
+<div class="glass p-10 rounded-3xl col-span-1 lg:col-span-2 flex flex-col md:flex-row items-center gap-8">
+<div class="relative">
+<div class="w-32 h-32 rounded-full border-2 border-primary p-1 neon-glow-primary">
+<img class="w-full h-full rounded-full object-cover" data-alt="Alex Johnson professional portrait with cyan glowing ring" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBFZBW6yY50Y2sshHguM9A6Tmya1LfoBuhNXJcYbmVG_oCQrzmCcowATujrZi9WJ5JQboQZirBd2vajpSAZe685vJmpbqfHX7S_71doUlZ1cFgEsixj3P0U8sOC08u_jNMn0hO6dwnxPILLhcnvDH-9TfpQaG33C7XMA2NuIZV_am94wKYO8bkLEfDiy4paGz4RJysNcFTeJEubalFwYU_WU794Uc0jKYaqVq_SrUOhoeP04UXHBQYwVxY5pi-Yh46Wz_4pbAZ68U"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-background-dark p-2 rounded-full neon-glow-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">photo_camera</span>
+</button>
+</div>
+<div class="flex-1 text-center md:text-left">
+<h2 class="text-2xl font-bold text-white">Alex Johnson</h2>
+<p class="text-slate-400">alex.johnson@financeflow.io</p>
+<div class="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20">PREMIUM MEMBER</span>
+<span class="px-3 py-1 bg-white/5 text-slate-300 text-xs font-medium rounded-full border border-white/10">SINCE 2023</span>
+</div>
+</div>
+<button class="bg-primary text-background-dark px-8 py-3 rounded-xl font-bold hover:scale-105 transition-transform neon-glow-primary">
+              Edit Profile
+            </button>
+</div>
+<!-- 2. Security Card -->
+<div class="glass p-10 rounded-3xl flex flex-col gap-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">lock</span>
+<h3 class="text-xl font-bold text-white">Security</h3>
+</div>
+<form class="space-y-4">
+<div class="space-y-2">
+<label class="text-sm font-medium text-slate-400 ml-1">Current Password</label>
+<input class="w-full bg-white/5 border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-slate-600" placeholder="••••••••" type="password"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-slate-400 ml-1">New Password</label>
+<input class="w-full bg-white/5 border-white/10 rounded-xl px-4 py-3 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-slate-600" placeholder="••••••••" type="password"/>
+</div>
+<button class="w-full bg-primary/10 border border-primary/30 text-primary py-3 rounded-xl font-bold hover:bg-primary hover:text-background-dark transition-all mt-2" type="submit">
+                Update Password
+              </button>
+</form>
+</div>
+<!-- 3. Preferences Card -->
+<div class="glass p-10 rounded-3xl flex flex-col gap-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">tune</span>
+<h3 class="text-xl font-bold text-white">Preferences</h3>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-semibold text-white">Email Notifications</p>
+<p class="text-xs text-slate-500">Weekly reports and alerts</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary/40 peer-checked:after:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-semibold text-white">Dark Mode</p>
+<p class="text-xs text-slate-500">System preference active</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary/40 peer-checked:after:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-semibold text-white">Two-Factor Auth</p>
+<p class="text-xs text-slate-500">Enhance your security</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary/40 peer-checked:after:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- 4. Danger Zone -->
+<div class="glass p-10 rounded-3xl col-span-1 lg:col-span-2 border-red-500/20 neon-glow-red flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="text-center md:text-left">
+<h3 class="text-xl font-bold text-red-400">Danger Zone</h3>
+<p class="text-slate-400 max-w-md">Deleting your account is permanent. All your financial history and premium settings will be wiped from our servers.</p>
+</div>
+<button class="bg-red-500/10 border border-red-500/40 text-red-500 px-8 py-3 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all">
+              Delete Account
+            </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

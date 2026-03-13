@@ -1,0 +1,33 @@
+Modules 
+1) Home Page
+Welcoming landing page with a brief description of the system.
+Navigation bar linking to all modules.
+Professional layout with a finance-related theme (subtle charts/icons).
+
+2) Login Page
+
+Simple login form (username/email + password).
+PHP + MySQL authentication (minimal database connectivity).
+Basic session handling for user access.                                                                               
+
+3)Form Page (Salary & Expenditure Input)
+
+Form fields: Salary, Rent, Food, Utilities, Savings, Miscellaneous.
+Data validation (numeric inputs).
+Store submitted data in MySQL (linked to user account).
+Option to edit/update entries.
+
+4) Finance Tracker Page
+
+Fetch data from MySQL and display user’s salary vs expenditure.
+Show balance (salary – total expenditure).
+Simple table + summary section.
+Highlight overspending with conditional formatting.
+
+5) Expense Categorizing Dashboard
+
+Visual dashboard with charts (use Chart.js or Google Charts).
+Categories: Rent, Food, Utilities, Savings, Miscellaneous.
+Pie chart for category distribution.
+Bar chart for monthly salary vs expenditure.
+Data pulled dynamically from MySQL.

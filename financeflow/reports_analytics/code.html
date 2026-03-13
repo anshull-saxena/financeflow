@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#0d968b",
+                "background-light": "#f6f8f8",
+                "background-dark": "#102220",
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+<title>Financial Insights | FinancePro</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-full min-h-screen">
+<!-- Side Navigation -->
+<aside class="w-64 border-r border-primary/10 bg-white dark:bg-background-dark sticky top-0 h-screen flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary rounded-lg size-10 flex items-center justify-center text-white">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<h1 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-none">FinancePro</h1>
+<p class="text-primary text-xs font-medium">Personal Advisor</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-2">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="text-sm font-medium">Transactions</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-sm font-medium">Budgets</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">savings</span>
+<span class="text-sm font-medium">Goals</span>
+</a>
+</nav>
+<div class="p-4 border-t border-primary/10">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-primary/5 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-3 py-2">
+<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/20">
+<img class="w-full h-full object-cover" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-L630f3Xaw_NJEFN_rQKDQiyqyPHt_uJl8tyEaaal6u-s0lSc0ueZ5BvjdJtYUzGt97Oj0JmHiX6eXV7CJRe_Hff9SZ1LHqfeEXrXSMXBnr_NVWzmhacyy74LI8WWEt9oRFV0sUIHSBdkJ13uFJ5rLGplX00JZkZe0knG9qMYm-1Fwc-BfiGyI7A6gfccgdf8LogQB4TsPPDylJ1zGwwPZLeGkfc2BS96sBtM4kxoNW5mAmUzpSEOTgyWLnguPO-s7F87gpE8yfA"/>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">Alex Morgan</p>
+<p class="text-[10px] text-slate-500 truncate">Premium Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-4 bg-white/50 dark:bg-background-dark/50 backdrop-blur-sm border-b border-primary/10 sticky top-0 z-10">
+<div class="flex items-center gap-4">
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold tracking-tight">Analytics Dashboard</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search reports..." type="text"/>
+</div>
+<button class="size-10 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-primary/10 text-slate-600 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all font-semibold text-sm">
+<span class="material-symbols-outlined text-sm">download</span>
+                        Export PDF
+                    </button>
+</div>
+</header>
+<div class="p-8 max-w-[1200px] mx-auto space-y-8">
+<!-- Page Title & Date Selectors -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Financial Insights</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Real-time analysis of your spending and income trends</p>
+</div>
+<div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-x-auto">
+<button class="px-4 py-2 text-xs font-bold bg-white dark:bg-slate-700 text-primary rounded-lg shadow-sm">Last 30 Days</button>
+<button class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Last 6 Months</button>
+<button class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Last Year</button>
+<button class="px-4 py-2 text-xs font-bold text-slate-500 flex items-center gap-1 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">
+                            Custom <span class="material-symbols-outlined text-sm">calendar_month</span>
+</button>
+</div>
+</div>
+<!-- Summary Highlight Card -->
+<div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex items-start gap-4">
+<div class="bg-primary text-white rounded-full size-12 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div>
+<h3 class="text-primary font-bold text-lg">AI Summary</h3>
+<p class="text-slate-700 dark:text-slate-300 leading-relaxed mt-1">
+                            Your spending in <span class="font-bold text-slate-900 dark:text-slate-100">'Dining Out'</span> increased by <span class="text-red-500 font-bold">15%</span> this month. 
+                            However, you've saved 8% more in utility costs compared to last period. We recommend adjusting your 'Entertainment' budget to stay on track for your vacation goal.
+                        </p>
+</div>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Line Chart: Income vs Expense -->
+<div class="bg-white dark:bg-background-dark border border-primary/10 rounded-2xl p-6 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Income vs Expense</h3>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<div class="size-2 rounded-full bg-primary"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Income</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="size-2 rounded-full bg-slate-300"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Expense</span>
+</div>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">$4,250.00</span>
+<span class="text-emerald-500 text-sm font-bold">+5.2%</span>
+</div>
+<div class="relative h-[240px] mt-2">
+<svg class="w-full h-full" fill="none" preserveaspectratio="none" viewbox="0 0 400 150">
+<path d="M0 120 Q 50 110, 100 80 T 200 60 T 300 30 T 400 10" fill="none" stroke="#0d968b" stroke-width="3"></path>
+<path d="M0 120 Q 50 110, 100 80 T 200 60 T 300 30 T 400 10 V 150 H 0 Z" fill="url(#grad1)" opacity="0.1"></path>
+<path d="M0 130 Q 50 135, 100 110 T 200 120 T 300 100 T 400 115" fill="none" stroke="#94a3b8" stroke-dasharray="4 2" stroke-width="2"></path>
+<defs>
+<lineargradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#0d968b;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#0d968b;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="absolute bottom-0 left-0 right-0 flex justify-between px-1">
+<span class="text-[10px] font-bold text-slate-400">Week 1</span>
+<span class="text-[10px] font-bold text-slate-400">Week 2</span>
+<span class="text-[10px] font-bold text-slate-400">Week 3</span>
+<span class="text-[10px] font-bold text-slate-400">Week 4</span>
+</div>
+</div>
+</div>
+<!-- Pie Chart: Expense Breakdown -->
+<div class="bg-white dark:bg-background-dark border border-primary/10 rounded-2xl p-6 flex flex-col gap-4 shadow-sm">
+<div class="flex items-center justify-between">
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Expense Breakdown</h3>
+<button class="text-primary hover:text-primary/70"><span class="material-symbols-outlined text-lg">more_horiz</span></button>
+</div>
+<div class="flex flex-1 items-center justify-center py-4">
+<div class="relative size-48">
+<svg class="size-full" viewbox="0 0 36 36">
+<path class="text-slate-100 dark:text-slate-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4"></path>
+<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="40, 100" stroke-linecap="round" stroke-width="4"></path>
+<path class="text-amber-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="25, 100" stroke-dashoffset="-40" stroke-linecap="round" stroke-width="4"></path>
+<path class="text-indigo-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="20, 100" stroke-dashoffset="-65" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total</span>
+<span class="text-xl font-black text-slate-900 dark:text-slate-100">$2,410</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-primary"></div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Housing (40%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-amber-500"></div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Food (25%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-indigo-500"></div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Travel (20%)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-slate-300"></div>
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">Other (15%)</span>
+</div>
+</div>
+</div>
+<!-- Horizontal Bar Chart: Category Comparison -->
+<div class="bg-white dark:bg-background-dark border border-primary/10 rounded-2xl p-6 lg:col-span-2 shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Category Comparison vs Budget</h3>
+<div class="flex items-center gap-2 text-xs font-bold text-slate-500">
+<span class="material-symbols-outlined text-base">info</span>
+                                Comparing current spending to planned budgets
+                            </div>
+</div>
+<div class="space-y-8">
+<!-- Category Row -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">Rent &amp; Housing</span>
+<div class="text-right">
+<span class="text-sm font-black text-slate-900 dark:text-slate-100">$1,200</span>
+<span class="text-[10px] text-slate-400 ml-1">of $1,200 budget</span>
+</div>
+</div>
+<div class="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: 100%;"></div>
+</div>
+</div>
+<!-- Category Row -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">Dining &amp; Groceries</span>
+<div class="text-right">
+<span class="text-sm font-black text-red-500">$640</span>
+<span class="text-[10px] text-slate-400 ml-1">of $500 budget</span>
+</div>
+</div>
+<div class="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-red-400 rounded-full transition-all duration-1000" style="width: 85%;"></div>
+</div>
+</div>
+<!-- Category Row -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">Transportation</span>
+<div class="text-right">
+<span class="text-sm font-black text-slate-900 dark:text-slate-100">$210</span>
+<span class="text-[10px] text-slate-400 ml-1">of $300 budget</span>
+</div>
+</div>
+<div class="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary/40 rounded-full transition-all duration-1000" style="width: 70%;"></div>
+</div>
+</div>
+<!-- Category Row -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">Entertainment</span>
+<div class="text-right">
+<span class="text-sm font-black text-slate-900 dark:text-slate-100">$150</span>
+<span class="text-[10px] text-slate-400 ml-1">of $200 budget</span>
+</div>
+</div>
+<div class="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary/40 rounded-full transition-all duration-1000" style="width: 75%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div class="bg-white dark:bg-background-dark border border-primary/10 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">share</span>
+                            Share Report
+                        </button>
+<div class="w-px h-6 bg-primary/10"></div>
+<button class="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">print</span>
+                            Print
+                        </button>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-slate-400">Auto-update enabled</span>
+<div class="size-2 rounded-full bg-emerald-500 animate-pulse"></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

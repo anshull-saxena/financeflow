@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinanceFlow Premium Income Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00eeff",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0a0f16",
+                        "glass": "rgba(255, 255, 255, 0.05)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "3xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .mesh-gradient {
+            background-color: #0a0f16;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 238, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(0, 238, 255, 0.5);
+        }
+        .neon-text-glow {
+            text-shadow: 0 0 10px rgba(0, 238, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display min-h-screen overflow-x-hidden mesh-gradient">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-24 flex flex-col items-center py-8 glassmorphism border-r border-white/10 z-20">
+<div class="mb-12">
+<div class="size-12 rounded-xl bg-primary flex items-center justify-center neon-glow">
+<span class="material-symbols-outlined text-background-dark font-bold text-3xl">token</span>
+</div>
+</div>
+<nav class="flex flex-col gap-8 flex-1">
+<a class="group flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-all duration-300" href="dashboard.html">
+<span class="material-symbols-outlined text-2xl">grid_view</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Dash</span>
+</a>
+<a class="group flex flex-col items-center gap-1 text-primary relative" href="income.html">
+<div class="absolute -inset-y-2 -inset-x-4 bg-primary/10 blur-md rounded-full"></div>
+<span class="material-symbols-outlined text-2xl neon-text-glow">trending_up</span>
+<span class="text-[10px] uppercase tracking-widest font-bold neon-text-glow">Income</span>
+</a>
+<a class="group flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-all duration-300" href="expenses.html">
+<span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Spends</span>
+</a>
+<a class="group flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-all duration-300" href="settings.html">
+<span class="material-symbols-outlined text-2xl">settings</span>
+<span class="text-[10px] uppercase tracking-widest font-bold">Setup</span>
+</a>
+</nav>
+<div class="mt-auto">
+<div class="size-10 rounded-full border border-primary/30 p-0.5 overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="Premium user profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0YlWUrj82iFlpqkNpFcleHjHAd1G4idYCtvdJ2IrieLChVq1O4TzDS5aO09Ly9m6O9zpVUNq60BUGCFcXQvfmIniflXOmlSzSQUgeJjdzVinfDpM5NUOfddEwFmsPQJzcqO4W00-7envqT_Hr0KoBdUC-YBbwG4h2ja-ZlgDGjRTbQWTHThyBv_QamxxxHXUSG_ZMlGE-j9_buexLb3gMTW_GKMMo7gpyfqi9Iw2Ngv3UXCXTSF9SXj4cT8xpBMvBA4TtIewR1-E"/>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto p-10 flex flex-col gap-8">
+<!-- Header Section -->
+<header class="flex justify-between items-end">
+<div>
+<p class="text-primary/70 text-sm font-bold uppercase tracking-[0.2em] mb-1">Financial Overview</p>
+<h1 class="text-5xl font-black tracking-tight">Income Management</h1>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-all duration-300 neon-glow group">
+<span class="material-symbols-outlined font-bold group-hover:rotate-90 transition-transform">add</span>
+<span>Add Income</span>
+</button>
+</header>
+<!-- Summary Cards -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="glassmorphism p-8 rounded-3xl group hover:border-primary/30 transition-all duration-500">
+<p class="text-slate-400 text-sm font-medium mb-4">Total Income This Month</p>
+<div class="flex items-end justify-between">
+<h2 class="text-4xl font-black text-white group-hover:text-primary transition-colors">$12,450</h2>
+<div class="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg text-xs font-bold">
+<span class="material-symbols-outlined text-sm">arrow_upward</span> 5.2%
+                        </div>
+</div>
+</div>
+<div class="glassmorphism p-8 rounded-3xl group hover:border-primary/30 transition-all duration-500">
+<p class="text-slate-400 text-sm font-medium mb-4">Average Monthly</p>
+<div class="flex items-end justify-between">
+<h2 class="text-4xl font-black text-white group-hover:text-primary transition-colors">$11,800</h2>
+<div class="flex items-center text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg text-xs font-bold">
+<span class="material-symbols-outlined text-sm">arrow_upward</span> 2.1%
+                        </div>
+</div>
+</div>
+<div class="glassmorphism p-8 rounded-3xl group hover:border-primary/30 transition-all duration-500">
+<p class="text-slate-400 text-sm font-medium mb-4">Income Sources</p>
+<div class="flex items-end justify-between">
+<h2 class="text-4xl font-black text-white group-hover:text-primary transition-colors">04</h2>
+<p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Active Channels</p>
+</div>
+</div>
+</section>
+<!-- Data & Chart Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- Records Table -->
+<div class="lg:col-span-8 glassmorphism rounded-3xl overflow-hidden min-h-[500px]">
+<div class="p-6 border-b border-white/10 flex justify-between items-center">
+<h3 class="font-bold text-lg">Recent Transactions</h3>
+<div class="flex gap-2">
+<button class="size-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-slate-400">
+<span class="material-symbols-outlined text-xl">filter_list</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-slate-400">
+<span class="material-symbols-outlined text-xl">search</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="text-slate-500 text-xs font-bold uppercase tracking-widest bg-white/5">
+<tr>
+<th class="px-6 py-4">Date</th>
+<th class="px-6 py-4">Source</th>
+<th class="px-6 py-4">Description</th>
+<th class="px-6 py-4">Amount</th>
+<th class="px-6 py-4 text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/10">
+<tr class="hover:bg-primary/5 group transition-all duration-300">
+<td class="px-6 py-6 text-slate-400 text-sm">Oct 24, 2023</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
+<span class="material-symbols-outlined text-lg">business</span>
+</div>
+<span class="font-bold">Tech Corp</span>
+</div>
+</td>
+<td class="px-6 py-6 text-slate-400 text-sm">Monthly Salary</td>
+<td class="px-6 py-6 font-bold text-primary">$8,500.00</td>
+<td class="px-6 py-6 text-center">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold">Cleared</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 group transition-all duration-300">
+<td class="px-6 py-6 text-slate-400 text-sm">Oct 20, 2023</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-lg">work</span>
+</div>
+<span class="font-bold">Upwork</span>
+</div>
+</td>
+<td class="px-6 py-6 text-slate-400 text-sm">Freelance Project</td>
+<td class="px-6 py-6 font-bold text-primary">$2,150.00</td>
+<td class="px-6 py-6 text-center">
+<span class="bg-amber-400/20 text-amber-400 px-3 py-1 rounded-full text-xs font-bold">Pending</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 group transition-all duration-300">
+<td class="px-6 py-6 text-slate-400 text-sm">Oct 15, 2023</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400">
+<span class="material-symbols-outlined text-lg">show_chart</span>
+</div>
+<span class="font-bold">Vanguard</span>
+</div>
+</td>
+<td class="px-6 py-6 text-slate-400 text-sm">Quarterly Dividends</td>
+<td class="px-6 py-6 font-bold text-primary">$1,800.00</td>
+<td class="px-6 py-6 text-center">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold">Cleared</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 group transition-all duration-300">
+<td class="px-6 py-6 text-slate-400 text-sm">Oct 12, 2023</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+<span class="material-symbols-outlined text-lg">house</span>
+</div>
+<span class="font-bold">Property Rental</span>
+</div>
+</td>
+<td class="px-6 py-6 text-slate-400 text-sm">Studio Unit #4B</td>
+<td class="px-6 py-6 font-bold text-primary">$1,200.00</td>
+<td class="px-6 py-6 text-center">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold">Cleared</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Chart Card -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="glassmorphism p-8 rounded-3xl min-h-[400px] flex flex-col">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-bold text-lg">Income Trend</h3>
+<span class="text-xs text-slate-500 font-bold uppercase tracking-widest">6 Months</span>
+</div>
+<div class="flex-1 flex items-end justify-between gap-2 px-2">
+<!-- Bar 1 -->
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-purple-500/20 to-purple-500/40 rounded-t-lg" style="height: 120px;"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">May</span>
+</div>
+<!-- Bar 2 -->
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-purple-500/30 to-purple-500/50 rounded-t-lg" style="height: 160px;"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Jun</span>
+</div>
+<!-- Bar 3 -->
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-primary/30 to-primary/50 rounded-t-lg neon-glow" style="height: 140px;"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Jul</span>
+</div>
+<!-- Bar 4 -->
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-primary/40 to-primary/60 rounded-t-lg neon-glow" style="height: 200px;"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase text-primary">Aug</span>
+</div>
+<!-- Bar 5 -->
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-purple-500/20 to-purple-500/40 rounded-t-lg" style="height: 90px;"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Sep</span>
+</div>
+<!-- Bar 6 -->
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg" style="height: 110px;"></div>
+<span class="text-[10px] font-bold text-slate-500 uppercase">Oct</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Growth</p>
+<p class="text-xl font-bold text-primary">+12.4%</p>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl">analytics</span>
+</div>
+</div>
+<div class="glassmorphism p-6 rounded-3xl relative overflow-hidden group cursor-pointer">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-4 relative z-10">
+<div class="size-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">rocket_launch</span>
+</div>
+<div>
+<h4 class="font-bold">Upgrade to Pro</h4>
+<p class="text-sm text-slate-400">Unlock detailed tax insights</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
