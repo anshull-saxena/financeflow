@@ -134,7 +134,7 @@
 <p class="text-slate-400 font-medium">Total Balance</p>
 <span class="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full">+12.5%</span>
 </div>
-<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="balance">$124,592.00</h2>
+<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="balance">₹124,592.00</h2>
 <div class="h-12 w-full">
 <svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
 <path d="M0 35 Q 25 35, 50 15 T 100 5" fill="none" stroke="#00eeff" stroke-width="2"></path>
@@ -147,7 +147,7 @@
 <p class="text-slate-400 font-medium">Monthly Income</p>
 <span class="bg-accent-purple/20 text-accent-purple text-xs px-2 py-1 rounded-full">+4.2%</span>
 </div>
-<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="income">$12,450.00</h2>
+<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="income">₹12,450.00</h2>
 <div class="h-12 w-full">
 <svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
 <path d="M0 25 Q 25 10, 50 25 T 100 15" fill="none" stroke="#a855f7" stroke-width="2"></path>
@@ -160,7 +160,7 @@
 <p class="text-slate-400 font-medium">Monthly Expenses</p>
 <span class="bg-red-400/20 text-red-400 text-xs px-2 py-1 rounded-full">-2.1%</span>
 </div>
-<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="expenses">$4,230.00</h2>
+<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="expenses">₹4,230.00</h2>
 <div class="h-12 w-full">
 <svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
 <path d="M0 5 Q 25 30, 50 20 T 100 35" fill="none" stroke="#f87171" stroke-width="2"></path>
@@ -195,10 +195,10 @@
 </svg>
 <!-- Y-Axis Labels -->
 <div class="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-slate-500 font-bold uppercase tracking-widest pb-6">
-<span>$150k</span>
-<span>$100k</span>
-<span>$50k</span>
-<span>$0</span>
+<span>₹150k</span>
+<span>₹100k</span>
+<span>₹50k</span>
+<span>₹0</span>
 </div>
 <!-- X-Axis Labels -->
 <div class="flex justify-between mt-4 text-[11px] text-slate-400 font-bold uppercase tracking-wider px-2">
@@ -280,7 +280,7 @@
 <input id="txnDesc" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="e.g. Monthly Salary" required/>
 </div>
 <div>
-<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Amount ($)</label>
+<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Amount (₹)</label>
 <input id="txnAmount" type="number" step="0.01" min="0.01" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="0.00" required/>
 </div>
 <div>
@@ -316,11 +316,11 @@
 <input id="goalName" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="e.g. Tokyo Trip" required/>
 </div>
 <div>
-<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Target Amount ($)</label>
+<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Target Amount (₹)</label>
 <input id="goalTarget" type="number" step="0.01" min="1" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="10000" required/>
 </div>
 <div>
-<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Saved So Far ($)</label>
+<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Saved So Far (₹)</label>
 <input id="goalSaved" type="number" step="0.01" min="0" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="0" required/>
 </div>
 <button type="submit" class="w-full bg-primary text-background-dark font-bold text-lg py-4 rounded-xl neon-glow hover:brightness-110 active:scale-[0.98] transition-all mt-2" id="goalSubmitBtn">Create Goal</button>
@@ -366,9 +366,9 @@ function render() {
     document.getElementById('dashboardGreeting').textContent = `Welcome back, ${userName.split(' ')[0]}!`;
 
     // Stats
-    document.querySelector('[data-stat="balance"]').textContent = '$' + balance.toLocaleString('en-US', { minimumFractionDigits: 2 });
-    document.querySelector('[data-stat="income"]').textContent = '$' + totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 });
-    document.querySelector('[data-stat="expenses"]').textContent = '$' + totalExpense.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    document.querySelector('[data-stat="balance"]').textContent = '₹' + balance.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    document.querySelector('[data-stat="income"]').textContent = '₹' + totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    document.querySelector('[data-stat="expenses"]').textContent = '₹' + totalExpense.toLocaleString('en-US', { minimumFractionDigits: 2 });
 
     // Transactions
     const tbody = document.getElementById('txnBody');
@@ -392,7 +392,7 @@ function render() {
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-right">
-                    <p class="${amtColor} font-bold">${amtPrefix}$${t.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                    <p class="${amtColor} font-bold">${amtPrefix}₹${t.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
                     <p class="text-slate-500 text-xs uppercase font-bold mt-1">${dateStr}</p>
                 </div>
                 <button class="delete-txn opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all" data-id="${t.id}">
@@ -421,8 +421,8 @@ function render() {
                 <div class="bg-${colorClass} h-full ${barShadow} transition-all duration-700" style="width: ${pct}%"></div>
             </div>
             <div class="flex justify-between mt-3">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Saved: $${g.saved.toLocaleString()}</p>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target: $${g.target.toLocaleString()}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Saved: ₹${g.saved.toLocaleString()}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target: ₹${g.target.toLocaleString()}</p>
             </div>
         </div>`;
     }).join('');

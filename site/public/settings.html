@@ -135,7 +135,7 @@
 </div>
 <div class="flex-1 text-center md:text-left">
 <h2 id="settingsUserName" class="text-2xl font-bold text-white">Alex Johnson</h2>
-<p class="text-slate-400">alex.johnson@financeflow.io</p>
+<p id="settingsUserEmail" class="text-slate-400">alex.johnson@financeflow.io</p>
 <div class="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
 <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20">PREMIUM MEMBER</span>
 <span class="px-3 py-1 bg-white/5 text-slate-300 text-xs font-medium rounded-full border border-white/10">SINCE 2023</span>
@@ -259,16 +259,24 @@ document.querySelectorAll('button').forEach(btn => {
     if (btn.textContent.trim() === 'Edit Profile') {
         // Init name
         const nameEl = document.getElementById('settingsUserName');
+        const emailEl = document.getElementById('settingsUserEmail');
         if (nameEl) nameEl.textContent = localStorage.getItem('ff_userName') || 'Alex Johnson';
+        if (emailEl) emailEl.textContent = localStorage.getItem('ff_email') || 'arushi.johri@gmail.com';
         
         btn.addEventListener('click', async function() {
             const currentName = nameEl?.textContent || 'Alex Johnson';
+            const currentEmail = emailEl?.textContent || 'arushi.johri@gmail.com';
             const newName = await window.showAppPrompt('Enter your name:', currentName);
             if (newName && newName.trim()) {
                 if(nameEl) nameEl.textContent = newName.trim();
                 localStorage.setItem('ff_userName', newName.trim());
-                await window.showAppAlert('Profile updated! Name syncs across all pages now.');
             }
+            const newEmail = await window.showAppPrompt('Enter your email:', currentEmail);
+            if (newEmail && newEmail.trim()) {
+                if(emailEl) emailEl.textContent = newEmail.trim();
+                localStorage.setItem('ff_email', newEmail.trim());
+            }
+            await window.showAppAlert('Profile updated! Changes syncs across all pages now.');
         });
     }
 });

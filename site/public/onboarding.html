@@ -109,6 +109,12 @@
 </div>
 <form id="onboardingForm" class="w-full space-y-6">
 <div class="space-y-2">
+<label class="text-slate-300 text-sm font-medium ml-1">Email Address</label>
+<div class="relative group">
+<input id="obEmail" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="e.g. arushi.johri@gmail.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
 <label class="text-slate-300 text-sm font-medium ml-1">Full Name</label>
 <div class="relative group">
 <input id="obName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="e.g. Alex Rivera" type="text"/>
@@ -156,21 +162,33 @@
 <div class="fixed top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 blur-[120px] rounded-full z-0 pointer-events-none"></div>
 <script src="shared_modals.js"></script>
 <script>
-    const currencyMap = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'INR': '₹' };
+    const currencyMap = { 'USD': '₹', 'EUR': '€', 'GBP': '£', 'INR': '₹' };
     const obCurrency = document.getElementById('obCurrency');
     const currencySymbol = document.getElementById('currencySymbol');
     
+    if (!localStorage.getItem('ff_userName')) {
+        localStorage.setItem('ff_userName', 'Arushi Johri');
+    }
+    if (!localStorage.getItem('ff_email')) {
+        localStorage.setItem('ff_email', 'arushi.johri@gmail.com');
+    }
+    
+    document.getElementById('obName').value = localStorage.getItem('ff_userName') || '';
+    document.getElementById('obEmail').value = localStorage.getItem('ff_email') || '';
+    
     obCurrency.addEventListener('change', (e) => {
-        currencySymbol.textContent = currencyMap[e.target.value] || '$';
+        currencySymbol.textContent = currencyMap[e.target.value] || '₹';
     });
 
     document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const name = document.getElementById('obName').value;
+        const email = document.getElementById('obEmail').value;
         const cur = document.getElementById('obCurrency').value;
         const goal = document.getElementById('obGoal').value;
         
         localStorage.setItem('ff_userName', name);
+        localStorage.setItem('ff_email', email);
         localStorage.setItem('ff_currency', cur);
         localStorage.setItem('ff_monthlyGoal', goal);
         
