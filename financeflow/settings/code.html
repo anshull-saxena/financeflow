@@ -30,7 +30,9 @@
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
 <div class="flex min-h-screen">
 <!-- Side Navigation -->
-<aside class="w-64 border-r border-primary/10 bg-white dark:bg-background-dark/50 hidden md:flex flex-col shrink-0">
+<style>.sidebar-overlay { display: none; } .sidebar-overlay.active { display: block; }</style>
+<div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-30 md:hidden" onclick="toggleSidebar()"></div>
+<aside id="sidebar" class="w-64 border-r border-primary/10 bg-white dark:bg-background-dark/50 fixed h-full z-40 flex flex-col transition-transform duration-300 -translate-x-full md:translate-x-0">
 <div class="p-6 flex items-center gap-3">
 <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
 <span class="material-symbols-outlined">payments</span>
@@ -66,14 +68,14 @@
 <div class="flex items-center gap-3 p-2">
 <div class="size-8 rounded-full bg-slate-200 dark:bg-slate-800 bg-cover bg-center" data-alt="User profile avatar circle" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuARf0WYpdgESKFpk-fxdq-qpw1YxQycb_yHsT_nDO4lvIQ_6_35MoxXwitbyW2CFLAy_SdLYB-QveE_dS5KEedw7RZeDJ_HvYFmsdHxyMCE76OiDJoLXq1mofZAgGsqjMOqYoprR7Hay5FPChuwJpCSXjKze0JjAg5STphbDSGf07Q-yFxRJHLXtXUUL7Dy7K10G9TCv2CKEorm0iPrRdd2fW-tFH9pAWwARn1Kwre9BqIU90FKdcWa_k0mReNHU2P3x0l12o7cm2g')"></div>
 <div class="flex flex-col overflow-hidden">
-<p class="text-xs font-bold truncate">John Doe</p>
-<p class="text-[10px] text-slate-500 truncate">john@finance.pro</p>
+<p class="text-xs font-bold truncate">Alex Johnson</p>
+<p class="text-[10px] text-slate-500 truncate">alex@finance.pro</p>
 </div>
 </div>
 </div>
 </aside>
 <!-- Main Content -->
-<main class="flex-1 flex flex-col min-w-0">
+<main class="flex-1 md:ml-64 flex flex-col min-w-0">
 <!-- Header -->
 <header class="p-8 pb-4">
 <h1 class="text-3xl font-black tracking-tight mb-2">Settings</h1>
@@ -102,15 +104,16 @@
 <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
 <div class="flex flex-col gap-1.5">
 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Full Name</label>
-<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="text" value="John Doe"/>
+<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="text" value="Alex Johnson"/>
 </div>
 <div class="flex flex-col gap-1.5">
 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Address</label>
-<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="email" value="john.doe@example.com"/>
+<input class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm" type="email" value="alex.johnson@example.com"/>
 </div>
 <div class="flex flex-col gap-1.5">
 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Default Currency</label>
 <select class="bg-background-light dark:bg-slate-800 border-none rounded-lg p-2.5 focus:ring-2 focus:ring-primary text-sm">
+<option selected>INR (₹)</option>
 <option>USD ($)</option>
 <option>EUR (€)</option>
 <option>GBP (£)</option>

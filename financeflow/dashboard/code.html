@@ -30,12 +30,15 @@
         body { font-family: 'Inter', sans-serif; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .filled { font-variation-settings: 'FILL' 1; }
+        .sidebar-overlay { display: none; }
+        .sidebar-overlay.active { display: block; }
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
 <div class="flex min-h-screen">
 <!-- Sidebar -->
-<aside class="w-64 bg-white dark:bg-background-dark border-r border-primary/10 flex flex-col fixed h-full">
+<div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-30 md:hidden" onclick="toggleSidebar()"></div>
+<aside id="sidebar" class="w-64 bg-white dark:bg-background-dark border-r border-primary/10 flex flex-col fixed h-full z-40 transition-transform duration-300 -translate-x-full md:translate-x-0">
 <div class="p-6 flex items-center gap-3">
 <div class="bg-primary rounded-lg p-2 text-white">
 <span class="material-symbols-outlined filled">account_balance_wallet</span>
@@ -80,10 +83,13 @@
 </div>
 </aside>
 <!-- Main Content -->
-<main class="flex-1 ml-64">
+<main class="flex-1 md:ml-64">
 <!-- Header -->
-<header class="h-16 bg-white dark:bg-background-dark border-b border-primary/10 flex items-center justify-between px-8 sticky top-0 z-10">
+<header class="h-16 bg-white dark:bg-background-dark border-b border-primary/10 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
 <div class="flex items-center gap-4 flex-1 max-w-xl">
+<button class="md:hidden p-2 rounded-lg hover:bg-primary/10 text-slate-600 dark:text-slate-400" onclick="toggleSidebar()">
+<span class="material-symbols-outlined">menu</span>
+</button>
 <div class="relative w-full">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
 <input class="w-full bg-background-light dark:bg-slate-800 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search transactions, reports..." type="text"/>
@@ -98,7 +104,7 @@
 </button>
 </div>
 </header>
-<div class="p-8 space-y-8">
+<div class="p-4 md:p-8 space-y-6 md:space-y-8">
 <!-- Welcome & Actions -->
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
 <div>
@@ -126,7 +132,7 @@
 <span class="text-green-600 text-sm font-bold">+12%</span>
 </div>
 <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Income</p>
-<p class="text-2xl font-black text-slate-900 dark:text-white mt-1">$5,200</p>
+<p class="text-2xl font-black text-slate-900 dark:text-white mt-1">₹5,200</p>
 </div>
 <div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-primary/10 shadow-sm">
 <div class="flex justify-between items-start mb-4">
@@ -136,7 +142,7 @@
 <span class="text-red-600 text-sm font-bold">-5%</span>
 </div>
 <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Expenses</p>
-<p class="text-2xl font-black text-slate-900 dark:text-white mt-1">$3,450</p>
+<p class="text-2xl font-black text-slate-900 dark:text-white mt-1">₹3,450</p>
 </div>
 <div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-primary/10 shadow-sm">
 <div class="flex justify-between items-start mb-4">
@@ -146,7 +152,7 @@
 <span class="text-primary text-sm font-bold">+8%</span>
 </div>
 <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Balance</p>
-<p class="text-2xl font-black text-slate-900 dark:text-white mt-1">$1,750</p>
+<p class="text-2xl font-black text-slate-900 dark:text-white mt-1">₹1,750</p>
 </div>
 <div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-primary/10 shadow-sm">
 <div class="flex justify-between items-start mb-4">
@@ -220,7 +226,7 @@
 <div class="relative w-48 h-48 rounded-full border-[16px] border-primary flex items-center justify-center mb-8">
 <div class="absolute inset-0 border-[16px] border-primary/20 rounded-full clip-path-polygon-[50%_0,100%_0,100%_100%,0_100%,0_50%]"></div>
 <div class="text-center">
-<p class="text-2xl font-black text-slate-900 dark:text-white leading-none">$3,450</p>
+<p class="text-2xl font-black text-slate-900 dark:text-white leading-none">₹3,450</p>
 <p class="text-xs text-slate-500 font-medium mt-1">Total</p>
 </div>
 </div>
@@ -280,7 +286,7 @@
 <td class="px-6 py-4">
 <span class="px-2 py-1 rounded text-[10px] font-black uppercase bg-slate-100 dark:bg-slate-800 text-slate-500">Technology</span>
 </td>
-<td class="px-6 py-4 text-sm font-bold text-right text-red-600">-$999.00</td>
+<td class="px-6 py-4 text-sm font-bold text-right text-red-600">-₹999.00</td>
 </tr>
 <tr class="hover:bg-primary/5 transition-colors">
 <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">Oct 23, 2023</td>
@@ -295,7 +301,7 @@
 <td class="px-6 py-4">
 <span class="px-2 py-1 rounded text-[10px] font-black uppercase bg-primary/10 text-primary">Food</span>
 </td>
-<td class="px-6 py-4 text-sm font-bold text-right text-red-600">-$45.50</td>
+<td class="px-6 py-4 text-sm font-bold text-right text-red-600">-₹45.50</td>
 </tr>
 <tr class="hover:bg-primary/5 transition-colors">
 <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">Oct 22, 2023</td>
@@ -310,7 +316,7 @@
 <td class="px-6 py-4">
 <span class="px-2 py-1 rounded text-[10px] font-black uppercase bg-green-100 dark:bg-green-900/30 text-green-600">Income</span>
 </td>
-<td class="px-6 py-4 text-sm font-bold text-right text-green-600">+$5,200.00</td>
+<td class="px-6 py-4 text-sm font-bold text-right text-green-600">+₹5,200.00</td>
 </tr>
 <tr class="hover:bg-primary/5 transition-colors">
 <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">Oct 21, 2023</td>
@@ -325,7 +331,7 @@
 <td class="px-6 py-4">
 <span class="px-2 py-1 rounded text-[10px] font-black uppercase bg-slate-100 dark:bg-slate-800 text-slate-500">Housing</span>
 </td>
-<td class="px-6 py-4 text-sm font-bold text-right text-red-600">-$112.00</td>
+<td class="px-6 py-4 text-sm font-bold text-right text-red-600">-₹112.00</td>
 </tr>
 </tbody>
 </table>
@@ -334,4 +340,12 @@
 </div>
 </main>
 </div>
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('active');
+}
+</script>
 </body></html>
