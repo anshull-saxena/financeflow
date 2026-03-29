@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -328,28 +327,13 @@
 </div>
 </div>
 
+<script src="shared_modals.js"></script>
 <script>
 // ── Data Layer (localStorage) ───────────────────────
 const STORE = {
     get(key, fallback) { try { return JSON.parse(localStorage.getItem('ff_' + key)) || fallback; } catch { return fallback; } },
     set(key, val) { localStorage.setItem('ff_' + key, JSON.stringify(val)); }
 };
-
-// Seed defaults if first visit
-if (!localStorage.getItem('ff_transactions')) {
-    STORE.set('transactions', [
-        { id: 1, type: 'expense', desc: 'Apple Store', category: 'Technology', amount: 1299, date: '2023-10-24T14:45:00' },
-        { id: 2, type: 'income',  desc: 'Monthly Salary', category: 'Salary', amount: 12450, date: '2023-10-01T09:00:00' },
-        { id: 3, type: 'expense', desc: 'Lumière Dining', category: 'Food', amount: 240.50, date: '2023-09-30T20:15:00' },
-        { id: 4, type: 'expense', desc: 'Skyline Airways', category: 'Transport', amount: 850, date: '2023-09-28T11:30:00' },
-    ]);
-}
-if (!localStorage.getItem('ff_goals')) {
-    STORE.set('goals', [
-        { id: 1, name: 'New Porsche 911', target: 160000, saved: 104000, color: 'primary' },
-        { id: 2, name: 'Tokyo Trip', target: 12000, saved: 11040, color: 'purple' },
-    ]);
-}
 
 const ICONS = { Salary:'payments', Freelance:'work', Investment:'show_chart', Food:'restaurant', Housing:'home', Transport:'flight', Entertainment:'movie', Technology:'shopping_bag', Other:'more_horiz' };
 
@@ -362,8 +346,9 @@ function render() {
     const balance = totalIncome - totalExpense;
 
     // User Profile
-    const userName = STORE.get('userName', localStorage.getItem('ff_userName') || 'Alex Johnson');
-    document.getElementById('dashboardGreeting').textContent = `Welcome back, ${userName.split(' ')[0]}!`;
+    const rawName = (localStorage.getItem('ff_userName') || '').trim();
+    const firstName = rawName ? rawName.split(' ')[0] : 'there';
+    document.getElementById('dashboardGreeting').textContent = `Welcome back, ${firstName}!`;
 
     // Stats
     document.querySelector('[data-stat="balance"]').textContent = '₹' + balance.toLocaleString('en-US', { minimumFractionDigits: 2 });
@@ -372,7 +357,17 @@ function render() {
 
     // Transactions
     const tbody = document.getElementById('txnBody');
-    tbody.innerHTML = txns.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8).map(t => {
+    const recentTxns = txns
+        .slice()
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 8);
+    if (recentTxns.length === 0) {
+        tbody.innerHTML = `<div class="glass p-6 rounded-2xl border border-white/10 text-center">
+            <p class="text-white font-bold mb-1">No transactions yet</p>
+            <p class="text-slate-400 text-sm">Click <span class="text-primary font-semibold">New Transaction</span> to add your first income or expense.</p>
+        </div>`;
+    } else {
+        tbody.innerHTML = recentTxns.map(t => {
         const d = new Date(t.date);
         const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         const icon = ICONS[t.category] || 'receipt';
@@ -400,10 +395,18 @@ function render() {
                 </button>
             </div>
         </div>`;
-    }).join('');
+        }).join('');
+    }
 
     // Goals
     const gc = document.getElementById('goalsContainer');
+    if (goals.length === 0) {
+        gc.innerHTML = `<div class="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
+            <p class="text-white font-bold mb-1">No goals yet</p>
+            <p class="text-slate-400 text-sm">Click the <span class="text-primary font-semibold">+</span> button to create your first goal.</p>
+        </div>`;
+        return;
+    }
     gc.innerHTML = goals.map(g => {
         const pct = Math.min(100, Math.round((g.saved / g.target) * 100));
         const colorClass = g.color === 'purple' ? 'accent-purple' : 'primary';
@@ -603,5 +606,4 @@ document.getElementById('upgradeProBtnSidebar')?.addEventListener('click', async
     await window.showAppAlert('🎉 Premium upgrade coming soon!\n\nAdvanced analytics, crypto-wallet integration, and AI-powered insights will be available in FinanceFlow Pro.');
 });
 </script>
-<script src="shared_modals.js"></script>
 </body></html>

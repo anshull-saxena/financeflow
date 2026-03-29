@@ -1,0 +1,23 @@
+{
+  "name": "financeflow-server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "db:migrate": "node --loader ts-node/esm src/db/migrate.ts",
+    "db:seed": "node --loader ts-node/esm src/scripts/seed.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "mysql2": "^3.11.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
+

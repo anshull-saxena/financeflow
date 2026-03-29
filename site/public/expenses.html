@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -105,7 +104,7 @@
 <img class="w-full h-full object-cover" data-alt="Professional user profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2qcmMR5HWnqwPXuqj-Kljb1xVxNpaRfRHHNOhGaHufuGeSEpD9Aj6uTRgXQ3c3qp8baSKyH5jDHN7exDmayqD1Hd8CGjVmIURI-NH8YeCwpRBRrHYfXFL8GzjgJYmFzWIVl4q6O0H5w3ysNj9ARgeZHhuPXod46CLZRtnjTB4AgeSMB33AHtBKt0Mh1VfhReIuup9pB_f6Sbwfell7ERzXs_o0anLjVyvx-p9i8Vc1FvbM6Nc1aJirsz7hIXzl_Xewb__3ifKgIY"/>
 </div>
 <div class="hidden lg:block overflow-hidden">
-<p id="sidebarUserName" class="text-sm font-bold truncate">Alex Johnson</p>
+<p id="sidebarUserName" class="text-sm font-bold truncate">User</p>
 <p id="sidebarUserEmail" class="text-xs text-slate-500 truncate">Pro Member</p>
 </div>
 </div>
@@ -269,6 +268,7 @@
 </div>
 </div>
 
+<script src="shared_modals.js"></script>
 <script>
 // ── Data Layer (localStorage) ───────────────────────
 const STORE = {
@@ -276,9 +276,14 @@ const STORE = {
     set(key, val) { localStorage.setItem('ff_' + key, JSON.stringify(val)); }
 };
 
+// Migrate legacy key
+if (!localStorage.getItem('ff_userEmail') && localStorage.getItem('ff_email')) {
+    localStorage.setItem('ff_userEmail', localStorage.getItem('ff_email'));
+}
+
 // User Profile
-document.getElementById('sidebarUserName').textContent = STORE.get('userName', localStorage.getItem('ff_userName') || 'Alex Johnson');
-document.getElementById('sidebarUserEmail').textContent = localStorage.getItem('ff_email') || 'arushi.johri@gmail.com';
+document.getElementById('sidebarUserName').textContent = STORE.get('userName', (localStorage.getItem('ff_userName') || '').trim() || 'User');
+document.getElementById('sidebarUserEmail').textContent = (localStorage.getItem('ff_userEmail') || '').trim() || '—';
 
 const modal = document.getElementById('expenseModal');
 const catIcons = { Housing: 'home', Food: 'shopping_cart', Transport: 'directions_car', Entertainment: 'movie', Other: 'more_horiz' };
@@ -415,5 +420,4 @@ document.getElementById('savingsVaultLink')?.addEventListener('click', async () 
 // Initial load
 renderExpenses();
 </script>
-<script src="shared_modals.js"></script>
 </body></html>

@@ -70,19 +70,22 @@
     </div>
     `;
 
-    // Wait until body is present
-    document.addEventListener("DOMContentLoaded", () => {
+    function insertModals() {
+        if (!document.body) return false;
+        if (document.getElementById('appModalContainer')) return true;
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-    });
-    // Fallback if already loaded
-    if(document.body) {
-        if(!document.getElementById('appModalContainer')) {
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-        }
+        return true;
+    }
+
+    // Best-effort insertion now; otherwise insert when DOM is ready.
+    if (!insertModals()) {
+        document.addEventListener('DOMContentLoaded', insertModals, { once: true });
     }
 
     function hideAll() {
+        if (!insertModals()) return;
         const container = document.getElementById('appModalContainer');
+        if (!container) return;
         container.classList.add('hidden');
         container.classList.remove('flex');
         document.getElementById('appAlertModal').classList.add('hidden');
@@ -91,6 +94,13 @@
     }
 
     window.showAppAlert = function(msg, title = 'Information') {
+        if (!insertModals()) {
+            return new Promise(resolve => {
+                document.addEventListener('DOMContentLoaded', () => {
+                    window.showAppAlert(msg, title).then(resolve);
+                }, { once: true });
+            });
+        }
         document.getElementById('appAlertTitle').textContent = title;
         document.getElementById('appAlertDesc').textContent = msg;
         
@@ -109,6 +119,13 @@
     };
 
     window.showAppConfirm = function(msg, title = 'Are you sure?') {
+        if (!insertModals()) {
+            return new Promise(resolve => {
+                document.addEventListener('DOMContentLoaded', () => {
+                    window.showAppConfirm(msg, title).then(resolve);
+                }, { once: true });
+            });
+        }
         document.getElementById('appConfirmTitle').textContent = title;
         document.getElementById('appConfirmDesc').textContent = msg;
 
@@ -124,6 +141,13 @@
     };
 
     window.showAppPrompt = function(msg, defaultValue = '', title = 'Input Required') {
+        if (!insertModals()) {
+            return new Promise(resolve => {
+                document.addEventListener('DOMContentLoaded', () => {
+                    window.showAppPrompt(msg, defaultValue, title).then(resolve);
+                }, { once: true });
+            });
+        }
         document.getElementById('appPromptTitle').textContent = title;
         document.getElementById('appPromptDesc').textContent = msg;
         

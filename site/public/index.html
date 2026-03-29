@@ -7,7 +7,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -123,18 +122,18 @@
 <label class="block text-sm font-medium text-[#8e9bb0] ml-1">Email Address</label>
 <div class="input-glass rounded-xl flex items-center px-4 py-1">
 <span class="material-symbols-outlined text-[#8e9bb0] mr-3">mail</span>
-<input id="emailInput" class="bg-transparent border-none focus:ring-0 text-white w-full py-3 placeholder:text-slate-600" placeholder="name@company.com" type="text"/>
+<input id="emailInput" class="bg-transparent border-none focus:ring-0 text-white w-full py-3 placeholder:text-slate-600" placeholder="name@company.com" type="email" inputmode="email" autocomplete="email"/>
 </div>
 </div>
 <div class="space-y-2">
 <div class="flex justify-between items-center px-1">
 <label class="block text-sm font-medium text-[#8e9bb0]">Password</label>
-<a class="text-sm font-medium text-[#8e9bb0] hover:text-primary transition-colors" href="#">Forgot Password?</a>
+<a id="forgotPasswordLink" class="text-sm font-medium text-[#8e9bb0] hover:text-primary transition-colors" href="#">Forgot Password?</a>
 </div>
 <div class="input-glass rounded-xl flex items-center px-4 py-1">
 <span class="material-symbols-outlined text-[#8e9bb0] mr-3">lock</span>
 <input id="passwordInput" class="bg-transparent border-none focus:ring-0 text-white w-full py-3 placeholder:text-slate-600" placeholder="••••••••" type="password"/>
-<button class="text-[#8e9bb0] hover:text-white transition-colors" type="button">
+<button id="togglePasswordVisibility" class="text-[#8e9bb0] hover:text-white transition-colors" type="button" aria-label="Toggle password visibility">
 <span class="material-symbols-outlined">visibility</span>
 </button>
 </div>
@@ -147,7 +146,7 @@
 <div class="mt-10 text-center">
 <p class="text-[#8e9bb0]">
                         Don't have an account? 
-                        <a class="text-primary font-semibold hover:underline decoration-primary/30 underline-offset-4" href="#">Create Account</a>
+                        <a id="createAccountLink" class="text-primary font-semibold hover:underline decoration-primary/30 underline-offset-4" href="onboarding.html">Create Account</a>
 </p>
 </div>
 </div>
@@ -157,22 +156,28 @@
 <span>End-to-End Encrypted Architecture</span>
 </div>
 </div>
+<script src="shared_modals.js"></script>
 <script>
     // Login form
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const email = document.getElementById('emailInput').value;
+        const emailEl = document.getElementById('emailInput');
+        const email = emailEl.value.trim();
         const password = document.getElementById('passwordInput').value;
         
-        if (password === 'admin123' || (email === 'admin' && password === 'admin')) {
-            window.location.href = 'dashboard.html';
-        } else {
-            await window.showAppAlert('Invalid credentials. Hint: use password "admin123"');
-        }
+        if (!email || !password) return window.showAppAlert('Please enter both email and password.');
+        if (!emailEl.checkValidity()) return window.showAppAlert('Please enter a valid email address (e.g. name@example.com).');
+
+        // Demo-only: persist minimal user identity for UI personalization.
+        localStorage.setItem('ff_userEmail', email);
+
+        // If user has completed onboarding, go to dashboard; otherwise route to onboarding.
+        const hasProfile = !!localStorage.getItem('ff_userName');
+        window.location.href = hasProfile ? 'dashboard.html' : 'onboarding.html';
     });
 
     // Password visibility toggle
-    document.querySelector('button[type="button"]').addEventListener('click', function() {
+    document.getElementById('togglePasswordVisibility').addEventListener('click', function() {
         const pwInput = document.getElementById('passwordInput');
         const icon = this.querySelector('.material-symbols-outlined');
         if (pwInput.type === 'password') {
@@ -185,21 +190,14 @@
     });
 
     // Forgot Password link
-    document.querySelector('a[href="#"]').addEventListener('click', async function(e) {
+    document.getElementById('forgotPasswordLink').addEventListener('click', async function(e) {
         e.preventDefault();
-        const email = document.getElementById('emailInput').value;
-        if (email) {
-            await window.showAppAlert('Password reset link sent to: ' + email);
-        } else {
-            await window.showAppAlert('Please enter your email address first, then click Forgot Password.');
-        }
+        const email = document.getElementById('emailInput').value.trim();
+        if (!email) return window.showAppAlert('Please enter your email address first, then click Forgot Password.');
+        await window.showAppAlert('If an account exists for that email, a reset link will be sent shortly.');
     });
 
     // Create Account link
-    document.querySelectorAll('a[href="#"]')[1]?.addEventListener('click', async function(e) {
-        e.preventDefault();
-        window.location.href = 'onboarding.html';
-    });
+    // (No JS needed; link points to onboarding.html)
 </script>
-<script src="shared_modals.js"></script>
 </body></html>

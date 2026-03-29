@@ -1,9 +1,11 @@
-<html class="dark"><head>
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinanceFlow Settings</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
     tailwind.config = {
@@ -127,15 +129,15 @@
 <div class="glass p-10 rounded-3xl col-span-1 lg:col-span-2 flex flex-col md:flex-row items-center gap-8">
 <div class="relative">
 <div class="w-32 h-32 rounded-full border-2 border-primary p-1 neon-glow-primary">
-<img class="w-full h-full rounded-full object-cover" data-alt="Alex Johnson professional portrait with cyan glowing ring" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBFZBW6yY50Y2sshHguM9A6Tmya1LfoBuhNXJcYbmVG_oCQrzmCcowATujrZi9WJ5JQboQZirBd2vajpSAZe685vJmpbqfHX7S_71doUlZ1cFgEsixj3P0U8sOC08u_jNMn0hO6dwnxPILLhcnvDH-9TfpQaG33C7XMA2NuIZV_am94wKYO8bkLEfDiy4paGz4RJysNcFTeJEubalFwYU_WU794Uc0jKYaqVq_SrUOhoeP04UXHBQYwVxY5pi-Yh46Wz_4pbAZ68U"/>
+<img class="w-full h-full rounded-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBFZBW6yY50Y2sshHguM9A6Tmya1LfoBuhNXJcYbmVG_oCQrzmCcowATujrZi9WJ5JQboQZirBd2vajpSAZe685vJmpbqfHX7S_71doUlZ1cFgEsixj3P0U8sOC08u_jNMn0hO6dwnxPILLhcnvDH-9TfpQaG33C7XMA2NuIZV_am94wKYO8bkLEfDiy4paGz4RJysNcFTeJEubalFwYU_WU794Uc0jKYaqVq_SrUOhoeP04UXHBQYwVxY5pi-Yh46Wz_4pbAZ68U"/>
 </div>
 <button class="absolute bottom-0 right-0 bg-primary text-background-dark p-2 rounded-full neon-glow-primary flex items-center justify-center">
 <span class="material-symbols-outlined text-sm">photo_camera</span>
 </button>
 </div>
 <div class="flex-1 text-center md:text-left">
-<h2 id="settingsUserName" class="text-2xl font-bold text-white">Alex Johnson</h2>
-<p id="settingsUserEmail" class="text-slate-400">alex.johnson@financeflow.io</p>
+<h2 id="settingsUserName" class="text-2xl font-bold text-white">User</h2>
+<p id="settingsUserEmail" class="text-slate-400">—</p>
 <div class="mt-4 flex flex-wrap gap-2 justify-center md:justify-start">
 <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20">PREMIUM MEMBER</span>
 <span class="px-3 py-1 bg-white/5 text-slate-300 text-xs font-medium rounded-full border border-white/10">SINCE 2023</span>
@@ -219,20 +221,21 @@
 </main>
 </div>
 
+<script src="shared_modals.js"></script>
 <script>
+// Migrate legacy keys
+if (!localStorage.getItem('ff_userEmail') && localStorage.getItem('ff_email')) {
+    localStorage.setItem('ff_userEmail', localStorage.getItem('ff_email'));
+}
+
 // Sign Out
-document.querySelector('button:has(.material-symbols-outlined:first-child)').closest('button[class*="hover:bg-red"]')?.addEventListener('click', async function() {
-    if (await window.showAppConfirm('Are you sure you want to sign out?')) {
-        localStorage.removeItem('ff_transactions');
-        localStorage.removeItem('ff_goals');
-        window.location.href = 'index.html';
-    }
-});
 // Simpler fallback: find the logout button by icon text
 document.querySelectorAll('.material-symbols-outlined').forEach(el => {
     if (el.textContent.trim() === 'logout') {
         el.closest('button').addEventListener('click', async function() {
             if (await window.showAppConfirm('Are you sure you want to sign out?')) {
+                localStorage.removeItem('ff_transactions');
+                localStorage.removeItem('ff_goals');
                 window.location.href = 'index.html';
             }
         });
@@ -260,12 +263,12 @@ document.querySelectorAll('button').forEach(btn => {
         // Init name
         const nameEl = document.getElementById('settingsUserName');
         const emailEl = document.getElementById('settingsUserEmail');
-        if (nameEl) nameEl.textContent = localStorage.getItem('ff_userName') || 'Alex Johnson';
-        if (emailEl) emailEl.textContent = localStorage.getItem('ff_email') || 'arushi.johri@gmail.com';
+        if (nameEl) nameEl.textContent = (localStorage.getItem('ff_userName') || '').trim() || 'User';
+        if (emailEl) emailEl.textContent = (localStorage.getItem('ff_userEmail') || '').trim() || '—';
         
         btn.addEventListener('click', async function() {
-            const currentName = nameEl?.textContent || 'Alex Johnson';
-            const currentEmail = emailEl?.textContent || 'arushi.johri@gmail.com';
+            const currentName = nameEl?.textContent || 'User';
+            const currentEmail = emailEl?.textContent === '—' ? '' : (emailEl?.textContent || '');
             const newName = await window.showAppPrompt('Enter your name:', currentName);
             if (newName && newName.trim()) {
                 if(nameEl) nameEl.textContent = newName.trim();
@@ -274,9 +277,9 @@ document.querySelectorAll('button').forEach(btn => {
             const newEmail = await window.showAppPrompt('Enter your email:', currentEmail);
             if (newEmail && newEmail.trim()) {
                 if(emailEl) emailEl.textContent = newEmail.trim();
-                localStorage.setItem('ff_email', newEmail.trim());
+                localStorage.setItem('ff_userEmail', newEmail.trim());
             }
-            await window.showAppAlert('Profile updated! Changes syncs across all pages now.');
+            await window.showAppAlert('Profile updated! Changes sync across all pages now.');
         });
     }
 });
@@ -304,11 +307,7 @@ document.querySelector('form')?.addEventListener('submit', async function(e) {
         await window.showAppAlert('New password must be at least 6 characters.');
         return;
     }
-    if (current !== 'admin123' && current !== 'admin') {
-        await window.showAppAlert('Current password is incorrect.');
-        return;
-    }
-    await window.showAppAlert('✅ Password updated successfully!');
+    await window.showAppAlert('✅ Password updated successfully! (Demo: not persisted)');
     inputs.forEach(i => i.value = '');
 });
 
@@ -345,5 +344,4 @@ if (savedName) {
     if (nameEl) nameEl.textContent = savedName;
 }
 </script>
-<script src="shared_modals.js"></script>
 </body></html>
