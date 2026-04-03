@@ -111,13 +111,19 @@
 <div class="space-y-2">
 <label class="text-slate-300 text-sm font-medium ml-1">Email Address</label>
 <div class="relative group">
-<input id="obEmail" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="e.g. name@example.com" type="email"/>
+<input id="obEmail" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="e.g. name@example.com" type="email"/>
 </div>
 </div>
 <div class="space-y-2">
 <label class="text-slate-300 text-sm font-medium ml-1">Full Name</label>
 <div class="relative group">
 <input id="obName" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="e.g. Alex Rivera" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-slate-300 text-sm font-medium ml-1">Password</label>
+<div class="relative group">
+<input id="obPassword" required minlength="6" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="At least 6 characters" type="password"/>
 </div>
 </div>
 <div class="space-y-2">
@@ -146,9 +152,7 @@
                         Complete Setup
                     </button>
 <div class="text-center">
-<button type="button" id="obSkip" class="text-[#8e9bb0] text-sm hover:text-white transition-colors underline-offset-4 decoration-[#8e9bb0]/30 hover:underline">
-                            Skip for now
-                        </button>
+<p class="text-[#8e9bb0] text-sm">Already have an account? <a href="index.html" class="text-primary font-semibold hover:underline">Sign in</a></p>
 </div>
 </div>
 </form>
@@ -161,42 +165,56 @@
 </main>
 <div class="fixed top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 blur-[120px] rounded-full z-0 pointer-events-none"></div>
 <script src="shared_modals.js"></script>
+<script src="api.js"></script>
 <script>
-    const currencyMap = { 'USD': '₹', 'EUR': '€', 'GBP': '£', 'INR': '₹' };
+    // If already logged in, redirect to dashboard
+    if (window.API.isLoggedIn()) {
+        window.location.href = 'dashboard.html';
+    }
+
+    const currencyMap = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'INR': '₹' };
     const obCurrency = document.getElementById('obCurrency');
     const currencySymbol = document.getElementById('currencySymbol');
 
-    // Migrate legacy key
-    if (!localStorage.getItem('ff_userEmail') && localStorage.getItem('ff_email')) {
-        localStorage.setItem('ff_userEmail', localStorage.getItem('ff_email'));
-    }
-    
-    document.getElementById('obName').value = localStorage.getItem('ff_userName') || '';
-    document.getElementById('obEmail').value = localStorage.getItem('ff_userEmail') || '';
-    
     obCurrency.addEventListener('change', (e) => {
         currencySymbol.textContent = currencyMap[e.target.value] || '₹';
     });
 
     document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const name = document.getElementById('obName').value;
-        const email = document.getElementById('obEmail').value;
-        const cur = document.getElementById('obCurrency').value;
-        const goal = document.getElementById('obGoal').value;
-        
-        localStorage.setItem('ff_userName', name);
-        localStorage.setItem('ff_userEmail', email);
-        localStorage.setItem('ff_currency', cur);
-        localStorage.setItem('ff_monthlyGoal', goal);
-        
-        await window.showAppAlert('Profile saved! Redirecting to your dashboard...', 'Success');
-        window.location.href = 'dashboard.html';
-    });
+        const name = document.getElementById('obName').value.trim();
+        const email = document.getElementById('obEmail').value.trim();
+        const password = document.getElementById('obPassword').value;
+        const currency = document.getElementById('obCurrency').value;
+        const monthlyGoal = document.getElementById('obGoal').value;
+        const btn = this.querySelector('button[type="submit"]');
 
-    document.getElementById('obSkip').addEventListener('click', async function() {
-        if(await window.showAppConfirm('Are you sure you want to skip? You can complete your profile later in settings.', 'Skip Onboarding')) {
-            window.location.href = 'dashboard.html';
+        if (!name || !email || !password) {
+            return window.showAppAlert('Please fill in all required fields.');
+        }
+        if (password.length < 6) {
+            return window.showAppAlert('Password must be at least 6 characters.');
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Setting up…';
+        try {
+            const result = await window.API.signup(name, email, password, currency, monthlyGoal);
+            if (result.success) {
+                localStorage.setItem('ff_token', result.data.token);
+                localStorage.setItem('ff_userName', result.data.user.name);
+                localStorage.setItem('ff_userEmail', result.data.user.email);
+                localStorage.setItem('ff_currency', currency);
+                await window.showAppAlert('Account created! Redirecting to your dashboard…', 'Success');
+                window.location.href = 'dashboard.html';
+            } else {
+                await window.showAppAlert(result.error || 'Signup failed. Please try again.');
+            }
+        } catch (err) {
+            await window.showAppAlert(err.message || 'Signup failed. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Complete Setup';
         }
     });
 </script>

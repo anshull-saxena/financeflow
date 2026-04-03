@@ -274,40 +274,54 @@
 <label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Amount (₹)</label>
 <input id="incAmount" type="number" step="0.01" min="0.01" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="0.00" required/>
 </div>
+<div>
+<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Category</label>
+<select id="incCategory" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+<option value="Salary">Salary</option>
+<option value="Freelance">Freelance</option>
+<option value="Investment">Investment</option>
+<option value="Business">Business</option>
+<option value="Other">Other</option>
+</select>
+</div>
 <button type="submit" class="w-full bg-primary text-background-dark font-bold text-lg py-4 rounded-xl neon-glow hover:brightness-110 active:scale-[0.98] transition-all mt-2">Add Income</button>
 </form>
 </div>
 </div>
 
 <script src="shared_modals.js"></script>
+<script src="api.js"></script>
 <script>
-// ── Data Layer (localStorage) ───────────────────────
-const STORE = {
-    get(key, fallback) { try { return JSON.parse(localStorage.getItem('ff_' + key)) || fallback; } catch { return fallback; } },
-    set(key, val) { localStorage.setItem('ff_' + key, JSON.stringify(val)); }
-};
+// Auth guard
+if (!window.API.isLoggedIn()) { window.location.href = 'index.html'; }
 
-const ICONS = { Salary:'payments', Freelance:'work', Investment:'show_chart', Food:'restaurant', Housing:'home', Transport:'flight', Entertainment:'movie', Technology:'shopping_bag', Other:'more_horiz' };
+const ICONS = { Salary:'payments', Freelance:'work', Investment:'show_chart', Food:'restaurant', Housing:'home', Transport:'flight', Entertainment:'movie', Technology:'shopping_bag', Other:'more_horiz', Business:'business_center' };
+
+let _income = [];
+
+function getCurrencySymbol() {
+    const map = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+    return map[localStorage.getItem('ff_currency')] || '₹';
+}
 
 function renderIncome() {
-    const allTxns = STORE.get('transactions', []);
-    const incomeTxns = allTxns.filter(t => t.type === 'income').sort((a, b) => new Date(b.date) - new Date(a.date));
-    
+    const sym = getCurrencySymbol();
+    const incomeTxns = _income.slice().sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt));
+
     // Update Stats
     const total = incomeTxns.reduce((sum, t) => sum + t.amount, 0);
-    document.getElementById('statTotalIncome').textContent = '₹' + total.toLocaleString('en-US', {minimumFractionDigits: 2});
-    document.getElementById('statAvgIncome').textContent = '₹' + (total / (incomeTxns.length || 1)).toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('statTotalIncome').textContent = sym + total.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('statAvgIncome').textContent = sym + (total / (incomeTxns.length || 1)).toLocaleString('en-US', {minimumFractionDigits: 2});
     document.getElementById('statIncomeCount').textContent = incomeTxns.length.toString().padStart(2, '0');
 
     // Update Table
     const tbody = document.getElementById('incomeTbody');
     tbody.innerHTML = incomeTxns.map(t => {
-        const d = new Date(t.date);
+        const d = new Date(t.occurredAt);
         const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const icon = ICONS[t.category] || 'payments';
-        // Randomize color based on category slightly
         const colors = ['blue', 'primary', 'purple', 'indigo', 'emerald'];
-        const c = colors[t.desc.length % colors.length];
+        const c = colors[t.description.length % colors.length];
         return `<tr class="hover:bg-primary/5 group transition-all duration-300">
             <td class="px-6 py-6 text-slate-400 text-sm">${dateStr}</td>
             <td class="px-6 py-6">
@@ -316,13 +330,13 @@ function renderIncome() {
                         <span class="material-symbols-outlined text-lg">${icon}</span>
                     </div>
                     <div>
-                        <span class="font-bold block text-white">${t.desc}</span>
+                        <span class="font-bold block text-white">${t.description}</span>
                         <span class="text-xs text-slate-500">${t.category}</span>
                     </div>
                 </div>
             </td>
-            <td class="px-6 py-6 text-slate-400 text-sm">Income entry</td>
-            <td class="px-6 py-6 font-bold text-primary">₹${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td class="px-6 py-6 text-slate-400 text-sm">Income</td>
+            <td class="px-6 py-6 font-bold text-primary">${sym}${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td class="px-6 py-6 flex items-center justify-end gap-3">
                 <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold">Cleared</span>
                 <button class="delete-inc opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all ml-2" data-id="${t.id}">
@@ -335,11 +349,29 @@ function renderIncome() {
     // Bind delete buttons
     document.querySelectorAll('.delete-inc').forEach(btn => btn.addEventListener('click', async function() {
         if(await window.showAppConfirm('Delete this income record?')) {
-            const id = Number(this.dataset.id);
-            STORE.set('transactions', STORE.get('transactions', []).filter(tx => tx.id !== id));
-            renderIncome();
+            const id = this.dataset.id;
+            try {
+                const res = await window.API.deleteTransaction(id);
+                if (res.success) {
+                    _income = _income.filter(tx => tx.id !== id);
+                    renderIncome();
+                }
+            } catch (err) { await window.showAppAlert('Failed to delete income record.'); }
         }
     }));
+}
+
+// Load income from API
+async function loadIncome() {
+    try {
+        const res = await window.API.getTransactions({ type: 'income' });
+        if (res.success) {
+            _income = res.data.transactions;
+            renderIncome();
+        }
+    } catch (err) {
+        console.error('Failed to load income:', err);
+    }
 }
 
 const modal = document.getElementById('incomeModal');
@@ -357,26 +389,36 @@ document.getElementById('closeIncomeModal').addEventListener('click', () => { mo
 modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }});
 
 // Add income form
-document.getElementById('incomeForm').addEventListener('submit', function(e) {
+document.getElementById('incomeForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
     const source = document.getElementById('incSource').value;
     const desc = document.getElementById('incDesc').value;
     const amount = parseFloat(document.getElementById('incAmount').value);
-    
-    const allTxns = STORE.get('transactions', []);
-    allTxns.push({
-        id: Date.now(),
-        type: 'income',
-        category: 'Freelance', // default for income page shortcut
-        desc: source + ' - ' + desc,
-        amount: amount,
-        date: new Date().toISOString()
-    });
-    STORE.set('transactions', allTxns);
-    
-    modal.classList.add('hidden'); modal.classList.remove('flex');
-    this.reset();
-    renderIncome();
+    const category = document.getElementById('incCategory')?.value || 'Salary';
+    try {
+        const res = await window.API.createTransaction({
+            type: 'income',
+            description: source + (desc ? ' - ' + desc : ''),
+            category,
+            amount
+        });
+        if (res.success) {
+            _income.push(res.data);
+            modal.classList.add('hidden'); modal.classList.remove('flex');
+            this.reset();
+            renderIncome();
+        } else {
+            await window.showAppAlert(res.error || 'Failed to add income.');
+        }
+    } catch (err) {
+        await window.showAppAlert('Failed to add income.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add Income';
+    }
 });
 
 // Filter button toggle
@@ -388,7 +430,6 @@ document.querySelectorAll('button').forEach(btn => {
             filterOn = !filterOn;
             btn.classList.toggle('bg-primary/20', filterOn);
             btn.classList.toggle('text-primary', filterOn);
-            // Example filter behavior (only high value txns > 1000)
             document.querySelectorAll('tbody tr').forEach(row => {
                 const amtEl = row.querySelector('td:nth-child(4)');
                 if(!amtEl) return;
@@ -427,16 +468,16 @@ document.querySelectorAll('button').forEach(btn => {
     }
 });
 
-// Upgrade to Pro
+// Upgrade to Pro card
 document.querySelectorAll('.group.cursor-pointer').forEach(card => {
     if (card.textContent.includes('Upgrade to Pro')) {
         card.addEventListener('click', async () => {
-            await window.showAppAlert('🎉 Premium upgrade coming soon!\n\nDetailed tax insights, AI-powered analytics, and smart reporting will be available in FinanceFlow Pro.');
+            await window.showAppAlert('Pro features including detailed tax insights, AI-powered analytics, and smart reporting are coming soon.');
         });
     }
 });
 
 // Initial Render
-renderIncome();
+loadIncome();
 </script>
 </body></html>

@@ -269,36 +269,38 @@
 </div>
 
 <script src="shared_modals.js"></script>
+<script src="api.js"></script>
 <script>
-// ── Data Layer (localStorage) ───────────────────────
-const STORE = {
-    get(key, fallback) { try { return JSON.parse(localStorage.getItem('ff_' + key)) || fallback; } catch { return fallback; } },
-    set(key, val) { localStorage.setItem('ff_' + key, JSON.stringify(val)); }
-};
+// Auth guard
+if (!window.API.isLoggedIn()) { window.location.href = 'index.html'; }
 
-// Migrate legacy key
-if (!localStorage.getItem('ff_userEmail') && localStorage.getItem('ff_email')) {
-    localStorage.setItem('ff_userEmail', localStorage.getItem('ff_email'));
-}
-
-// User Profile
-document.getElementById('sidebarUserName').textContent = STORE.get('userName', (localStorage.getItem('ff_userName') || '').trim() || 'User');
-document.getElementById('sidebarUserEmail').textContent = (localStorage.getItem('ff_userEmail') || '').trim() || '—';
+// Load user info
+const _userName = (localStorage.getItem('ff_userName') || '').trim() || 'User';
+const _userEmail = (localStorage.getItem('ff_userEmail') || '').trim() || '—';
+document.getElementById('sidebarUserName').textContent = _userName;
+document.getElementById('sidebarUserEmail').textContent = _userEmail;
 
 const modal = document.getElementById('expenseModal');
-const catIcons = { Housing: 'home', Food: 'shopping_cart', Transport: 'directions_car', Entertainment: 'movie', Other: 'more_horiz' };
-const catColors = { Housing: 'orange', Food: 'emerald', Transport: 'blue', Entertainment: 'purple', Other: 'slate' };
+const catIcons = { Housing: 'home', Food: 'shopping_cart', Transport: 'directions_car', Entertainment: 'movie', Other: 'more_horiz', Technology: 'shopping_bag', Healthcare: 'local_hospital', Shopping: 'storefront', Education: 'school' };
+const catColors = { Housing: 'orange', Food: 'emerald', Transport: 'blue', Entertainment: 'purple', Other: 'slate', Technology: 'cyan', Healthcare: 'red', Shopping: 'pink', Education: 'indigo' };
+
+let _expenses = [];
+
+function getCurrencySymbol() {
+    const map = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+    return map[localStorage.getItem('ff_currency')] || '₹';
+}
 
 function renderExpenses() {
-    const allTxns = STORE.get('transactions', []);
-    const expenses = allTxns.filter(t => t.type === 'expense').sort((a, b) => new Date(b.date) - new Date(a.date));
-    
+    const sym = getCurrencySymbol();
+    const expenses = _expenses.slice().sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt));
+
     // Stats
     const total = expenses.reduce((sum, t) => sum + t.amount, 0);
-    document.getElementById('statTotalExp').innerHTML = `₹${Math.floor(total).toLocaleString()}<span class="text-xl text-primary/50">.${(total%1).toFixed(2).substring(2)}</span>`;
+    document.getElementById('statTotalExp').innerHTML = `${sym}${Math.floor(total).toLocaleString()}<span class="text-xl text-primary/50">.${(total%1).toFixed(2).substring(2)}</span>`;
     document.getElementById('statExpCount').textContent = expenses.length;
-    document.getElementById('statExpAvg').textContent = `Avg. ₹${(total / (expenses.length || 1)).toFixed(2)} per transaction`;
-    
+    document.getElementById('statExpAvg').textContent = `Avg. ${sym}${(total / (expenses.length || 1)).toFixed(2)} per transaction`;
+
     // Biggest Category
     const catMap = {};
     expenses.forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + t.amount; });
@@ -308,13 +310,13 @@ function renderExpenses() {
     }
     const biggestPct = total > 0 ? Math.round((biggestAmt / total) * 100) : 0;
     document.getElementById('statBiggestCatName').textContent = biggestCat;
-    document.getElementById('statBiggestCatAmount').textContent = `₹${biggestAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    document.getElementById('statBiggestCatAmount').textContent = `${sym}${biggestAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
     document.getElementById('statBiggestCatPct').textContent = `| ${biggestPct}% of total`;
 
     // Table
     const tbody = document.getElementById('expenseTbody');
     tbody.innerHTML = expenses.map(t => {
-        const d = new Date(t.date);
+        const d = new Date(t.occurredAt);
         const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
         const icon = catIcons[t.category] || 'receipt';
         const color = catColors[t.category] || 'slate';
@@ -324,9 +326,9 @@ function renderExpenses() {
                 <div class="size-8 rounded-lg bg-${color}-500/20 flex items-center justify-center text-${color}-500">
                     <span class="material-symbols-outlined text-lg">${icon}</span>
                 </div><span class="font-bold text-white">${t.category}</span></div></td>
-            <td class="px-6 py-6 text-slate-300 font-medium">${t.desc}</td>
+            <td class="px-6 py-6 text-slate-300 font-medium">${t.description}</td>
             <td class="px-6 py-6 text-right flex items-center justify-end gap-4 h-full">
-                <span class="text-white font-black text-lg group-hover:text-primary transition-colors">₹${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                <span class="text-white font-black text-lg group-hover:text-primary transition-colors">${sym}${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
                 <button class="delete-exp opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all" data-id="${t.id}">
                     <span class="material-symbols-outlined text-lg">delete</span>
                 </button>
@@ -334,18 +336,35 @@ function renderExpenses() {
         </tr>`;
     }).join('');
 
-    // Filter reapplies visually
     applyFilter();
-    
+
     // Bind deletes
     document.querySelectorAll('.delete-exp').forEach(btn => btn.addEventListener('click', async function(e) {
         e.stopPropagation();
         if(await window.showAppConfirm('Delete this expense?')) {
-            const id = Number(this.dataset.id);
-            STORE.set('transactions', STORE.get('transactions', []).filter(tx => tx.id !== id));
-            renderExpenses();
+            const id = this.dataset.id;
+            try {
+                const res = await window.API.deleteTransaction(id);
+                if (res.success) {
+                    _expenses = _expenses.filter(tx => tx.id !== id);
+                    renderExpenses();
+                }
+            } catch (err) { await window.showAppAlert('Failed to delete expense.'); }
         }
     }));
+}
+
+// Load expenses from API
+async function loadExpenses() {
+    try {
+        const res = await window.API.getTransactions({ type: 'expense' });
+        if (res.success) {
+            _expenses = res.data.transactions;
+            renderExpenses();
+        }
+    } catch (err) {
+        console.error('Failed to load expenses:', err);
+    }
 }
 
 // Add Expense button
@@ -358,33 +377,38 @@ document.getElementById('closeExpenseModal').addEventListener('click', () => { m
 modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }});
 
 // Submit expense
-document.getElementById('expenseForm').addEventListener('submit', function(e) {
+document.getElementById('expenseForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const cat = document.getElementById('expCategory').value;
-    const desc = document.getElementById('expDesc').value;
-    const amount = parseFloat(document.getElementById('expAmount').value);
-    
-    const allTxns = STORE.get('transactions', []);
-    allTxns.push({
-        id: Date.now(),
-        type: 'expense',
-        category: cat,
-        desc: desc,
-        amount: amount,
-        date: new Date().toISOString()
-    });
-    STORE.set('transactions', allTxns);
-    
-    modal.classList.add('hidden'); modal.classList.remove('flex');
-    this.reset();
-    renderExpenses();
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+    try {
+        const res = await window.API.createTransaction({
+            type: 'expense',
+            category: document.getElementById('expCategory').value,
+            description: document.getElementById('expDesc').value,
+            amount: parseFloat(document.getElementById('expAmount').value)
+        });
+        if (res.success) {
+            _expenses.push(res.data);
+            modal.classList.add('hidden'); modal.classList.remove('flex');
+            this.reset();
+            renderExpenses();
+        } else {
+            await window.showAppAlert(res.error || 'Failed to add expense.');
+        }
+    } catch (err) {
+        await window.showAppAlert('Failed to add expense.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add Expense';
+    }
 });
 
 // Category filter pills
 let currentFilter = 'All';
-const filterBtns = document.querySelectorAll('button');
 const pills = [];
-filterBtns.forEach(btn => {
+document.querySelectorAll('button').forEach(btn => {
     const t = btn.textContent.trim();
     if (['All', 'Housing', 'Food', 'Transport', 'Entertainment'].includes(t)) {
         pills.push(btn);
@@ -414,10 +438,10 @@ pills.forEach(btn => {
 
 // Savings Vault link
 document.getElementById('savingsVaultLink')?.addEventListener('click', async () => {
-    await window.showAppAlert('💰 Savings Vault\n\nThis feature will let you automatically redirect excess spending savings into a dedicated vault. Coming in FinanceFlow Pro!');
+    await window.showAppAlert('Savings Vault is coming soon. This feature will let you redirect excess spending savings into a dedicated vault.');
 });
 
 // Initial load
-renderExpenses();
+loadExpenses();
 </script>
 </body></html>

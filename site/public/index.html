@@ -157,23 +157,42 @@
 </div>
 </div>
 <script src="shared_modals.js"></script>
+<script src="api.js"></script>
 <script>
+    // If already logged in, redirect to dashboard
+    if (window.API.isLoggedIn()) {
+        window.location.href = 'dashboard.html';
+    }
+
     // Login form
     document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const emailEl = document.getElementById('emailInput');
         const email = emailEl.value.trim();
         const password = document.getElementById('passwordInput').value;
-        
+        const btn = this.querySelector('button[type="submit"]');
+
         if (!email || !password) return window.showAppAlert('Please enter both email and password.');
         if (!emailEl.checkValidity()) return window.showAppAlert('Please enter a valid email address (e.g. name@example.com).');
 
-        // Demo-only: persist minimal user identity for UI personalization.
-        localStorage.setItem('ff_userEmail', email);
-
-        // If user has completed onboarding, go to dashboard; otherwise route to onboarding.
-        const hasProfile = !!localStorage.getItem('ff_userName');
-        window.location.href = hasProfile ? 'dashboard.html' : 'onboarding.html';
+        btn.disabled = true;
+        btn.textContent = 'Signing in…';
+        try {
+            const result = await window.API.login(email, password);
+            if (result.success) {
+                localStorage.setItem('ff_token', result.data.token);
+                localStorage.setItem('ff_userName', result.data.user.name);
+                localStorage.setItem('ff_userEmail', result.data.user.email);
+                window.location.href = 'dashboard.html';
+            } else {
+                await window.showAppAlert(result.error || 'Login failed. Please check your credentials.');
+            }
+        } catch (err) {
+            await window.showAppAlert(err.message || 'Login failed. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Sign In';
+        }
     });
 
     // Password visibility toggle
@@ -194,10 +213,7 @@
         e.preventDefault();
         const email = document.getElementById('emailInput').value.trim();
         if (!email) return window.showAppAlert('Please enter your email address first, then click Forgot Password.');
-        await window.showAppAlert('If an account exists for that email, a reset link will be sent shortly.');
+        await window.showAppAlert('Password reset is not yet available. Please contact support if you have forgotten your password.');
     });
-
-    // Create Account link
-    // (No JS needed; link points to onboarding.html)
 </script>
 </body></html>

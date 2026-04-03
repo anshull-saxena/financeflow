@@ -7,17 +7,28 @@
     "node": ">=18"
   },
   "scripts": {
+    "dev": "node --loader ts-node/esm src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "db:migrate": "node --loader ts-node/esm src/db/migrate.ts",
     "db:seed": "node --loader ts-node/esm src/scripts/seed.ts"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "mysql2": "^3.11.4"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.2",
+    "helmet": "^8.1.0",
+    "mysql2": "^3.20.0"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
     "@types/node": "^22.10.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   }
 }
-

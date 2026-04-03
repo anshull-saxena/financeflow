@@ -13,3 +13,13 @@ export const pool = mysql.createPool({
   charset: 'utf8mb4',
 });
 
+// Test database connection on startup
+(async () => {
+  try {
+    const connection = await pool.getConnection();
+    console.log('✅ Database connected successfully');
+    connection.release();
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+  }
+})();

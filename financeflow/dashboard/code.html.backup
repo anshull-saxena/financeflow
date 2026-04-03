@@ -7,7 +7,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -49,24 +49,24 @@
 </div>
 </div>
 <nav class="flex-1 px-4 space-y-1 mt-4">
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-semibold" href="/">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary font-semibold" href="#">
 <span class="material-symbols-outlined filled">dashboard</span>
 <span class="text-sm">Dashboard</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="/income">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined">trending_up</span>
 <span class="text-sm">Income</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="/expenses">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined">trending_down</span>
 <span class="text-sm">Expenses</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="/analytics">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined">pie_chart</span>
 <span class="text-sm">Analytics</span>
 </a>
 <div class="pt-4 mt-4 border-t border-primary/10">
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="/settings">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/5 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined">settings</span>
 <span class="text-sm">Settings</span>
 </a>
@@ -98,10 +98,6 @@
 <div class="flex items-center gap-4">
 <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-background-light dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
 <span class="material-symbols-outlined">notifications</span>
-</button>
-<button onclick="DarkMode.toggle()" class="w-10 h-10 flex items-center justify-center rounded-lg bg-background-light dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
-<span class="material-symbols-outlined dark:hidden">dark_mode</span>
-<span class="material-symbols-outlined hidden dark:block">light_mode</span>
 </button>
 <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-background-light dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-primary transition-colors">
 <span class="material-symbols-outlined">help</span>
@@ -351,142 +347,5 @@ function toggleSidebar() {
     sidebar.classList.toggle('-translate-x-full');
     overlay.classList.toggle('active');
 }
-
-// FinanceFlow Real Data Integration
-const API_BASE = 'http://localhost:3001/api';
-
-function formatCurrency(amount) {
-    return '₹' + Math.abs(amount).toLocaleString('en-IN');
-}
-
-function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        month: 'short', day: 'numeric', year: 'numeric'
-    });
-}
-
-let monthlyChart = null;
-let categoryChart = null;
-
-function createMonthlyBarChart(data) {
-    const container = document.getElementById('monthly-chart-container');
-    const maxValue = Math.max(...data.map(d => Math.max(d.income, d.expenses)));
-    
-    container.innerHTML = data.map(item => {
-        const incomeHeight = (item.income / maxValue) * 100;
-        const expenseHeight = (item.expenses / maxValue) * 100;
-        return `
-            <div class="flex flex-col items-center gap-2 flex-1">
-                <div class="w-full flex items-end gap-1 h-40">
-                    <div class="bg-primary w-full rounded-t-sm" style="height: ${incomeHeight}%"></div>
-                    <div class="bg-primary/30 w-full rounded-t-sm" style="height: ${expenseHeight}%"></div>
-                </div>
-                <span class="text-xs text-slate-400 font-medium">${item.month}</span>
-            </div>
-        `;
-    }).join('');
-}
-
-function createCategoryChart(data) {
-    const ctx = document.getElementById('category-chart').getContext('2d');
-    if (categoryChart) categoryChart.destroy();
-    
-    const colors = ['#0d968b', '#0d968bb3', '#0d968b80', '#0d968b4d', '#0d968b26'];
-    categoryChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: data.map(d => d.category),
-            datasets: [{
-                data: data.map(d => d.amount),
-                backgroundColor: colors.slice(0, data.length),
-                borderWidth: 0,
-                cutout: '70%'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: { legend: { display: false } }
-        }
-    });
-}
-
-function updateCategoryLegend(data) {
-    const colors = ['bg-primary', 'bg-primary/70', 'bg-primary/40', 'bg-primary/20', 'bg-primary/10'];
-    document.getElementById('category-legend').innerHTML = data.map((item, i) => `
-        <div class="flex items-center justify-between text-sm">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full ${colors[i] || 'bg-primary/10'}"></span>
-                <span class="text-slate-600 dark:text-slate-300">${item.category}</span>
-            </div>
-            <span class="font-bold">${item.percentage}%</span>
-        </div>
-    `).join('');
-}
-
-function getIcon(category) {
-    const icons = {
-        'Technology': 'shopping_bag', 'Food': 'restaurant', 'Salary': 'work',
-        'Housing': 'electric_bolt', 'Transport': 'directions_car'
-    };
-    return icons[category] || 'receipt';
-}
-
-function updateTransactionsTable(transactions) {
-    document.getElementById('transactions-table').innerHTML = transactions.map(tx => {
-        const isIncome = tx.type === 'income' || tx.amount > 0;
-        const amount = Math.abs(tx.amount);
-        const color = isIncome ? 'text-green-600' : 'text-red-600';
-        const prefix = isIncome ? '+' : '-';
-        return `
-            <tr class="hover:bg-primary/5 transition-colors">
-                <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-300">${formatDate(tx.occurredAt)}</td>
-                <td class="px-6 py-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                            <span class="material-symbols-outlined text-sm">${getIcon(tx.category)}</span>
-                        </div>
-                        <span class="text-sm font-bold text-slate-900 dark:text-white">${tx.description}</span>
-                    </div>
-                </td>
-                <td class="px-6 py-4">
-                    <span class="px-2 py-1 rounded text-[10px] font-black uppercase ${isIncome ? 'bg-green-100 dark:bg-green-900/30 text-green-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}">${tx.category}</span>
-                </td>
-                <td class="px-6 py-4 text-sm font-bold text-right ${color}">${prefix}${formatCurrency(amount)}</td>
-            </tr>
-        `;
-    }).join('');
-}
-
-async function loadDashboard() {
-    try {
-        const response = await fetch(`${API_BASE}/dashboard`);
-        if (!response.ok) throw new Error('API not responding');
-        
-        const { data } = await response.json();
-        const { stats } = data;
-        
-        // Update stats
-        document.getElementById('total-income').textContent = formatCurrency(stats.totalIncome);
-        document.getElementById('total-expenses').textContent = formatCurrency(stats.totalExpenses);
-        document.getElementById('balance').textContent = formatCurrency(stats.balance);
-        document.getElementById('savings-rate').textContent = stats.savingsRate + '%';
-        
-        // Update charts
-        createMonthlyBarChart(stats.monthlyData);
-        createCategoryChart(stats.categoryBreakdown);
-        updateCategoryLegend(stats.categoryBreakdown);
-        updateTransactionsTable(stats.recentTransactions);
-        
-        console.log('✅ Dashboard loaded with real data from API');
-    } catch (error) {
-        console.error('⚠️ Failed to load real data:', error);
-        console.log('📌 Using fallback static data (ensure API server is running on port 3001)');
-    }
-}
-
-// Load data when page loads
-document.addEventListener('DOMContentLoaded', loadDashboard);
 </script>
-<script src="/static/shared/toast.js"></script>
 </body></html>
