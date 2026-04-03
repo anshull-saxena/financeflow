@@ -156,6 +156,7 @@
 <span>End-to-End Encrypted Architecture</span>
 </div>
 </div>
+<script src="api.js"></script>
 <script src="shared_modals.js"></script>
 <script>
     // Login form
@@ -164,16 +165,27 @@
         const emailEl = document.getElementById('emailInput');
         const email = emailEl.value.trim();
         const password = document.getElementById('passwordInput').value;
+        const submitBtn = this.querySelector('button[type="submit"]');
         
         if (!email || !password) return window.showAppAlert('Please enter both email and password.');
         if (!emailEl.checkValidity()) return window.showAppAlert('Please enter a valid email address (e.g. name@example.com).');
 
-        // Demo-only: persist minimal user identity for UI personalization.
-        localStorage.setItem('ff_userEmail', email);
-
-        // If user has completed onboarding, go to dashboard; otherwise route to onboarding.
-        const hasProfile = !!localStorage.getItem('ff_userName');
-        window.location.href = hasProfile ? 'dashboard.html' : 'onboarding.html';
+        try {
+            submitBtn.textContent = 'Signing in...';
+            submitBtn.disabled = true;
+            
+            const req = await API.post('/auth/login', { email, password });
+            API.setToken(req.token);
+            
+            // Onboarding check happens via existence of profile name in localStorage, but since we are server-backed we route to dashboard safely.
+            const hasProfile = !!localStorage.getItem('ff_userName');
+            window.location.href = hasProfile ? 'dashboard.html' : 'onboarding.html';
+        } catch(error) {
+            window.showAppAlert(error.message || 'Invalid credentials');
+        } finally {
+            submitBtn.textContent = 'Sign In';
+            submitBtn.disabled = false;
+        }
     });
 
     // Password visibility toggle

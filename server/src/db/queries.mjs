@@ -50,12 +50,10 @@ export async function getTransactions(userId, filters = {}) {
   sql += ' ORDER BY occurred_at DESC';
   
   if (filters.limit) {
-    sql += ' LIMIT ?';
-    params.push(parseInt(filters.limit));
+    sql += ` LIMIT ${parseInt(filters.limit)}`;
     
     if (filters.offset) {
-      sql += ' OFFSET ?';
-      params.push(parseInt(filters.offset));
+      sql += ` OFFSET ${parseInt(filters.offset)}`;
     }
   }
   

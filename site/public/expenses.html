@@ -131,8 +131,8 @@
 <span class="material-symbols-outlined text-xs">calendar_today</span> Total Expenses
                     </p>
 <h3 id="statTotalExp" class="text-5xl font-black text-white tracking-tight group-hover:text-primary transition-colors">₹0<span class="text-xl text-primary/50">.00</span></h3>
-<div class="mt-4 flex items-center gap-2 text-emerald-400 text-sm font-bold">
-<span class="material-symbols-outlined text-sm">trending_down</span> 12% decrease
+<div id="statExpTrend" class="mt-4 flex items-center gap-2 text-slate-500 text-sm font-bold">
+<span class="material-symbols-outlined text-sm">remove</span> No previous data
                     </div>
 </div>
 <div class="glass p-8 rounded-xl border-white/10 group hover:border-primary/30 transition-all">
@@ -160,11 +160,13 @@
 <div class="flex-1">
 <!-- Filters -->
 <div class="flex flex-wrap gap-3 mb-6">
-<button class="px-6 py-2 rounded-full bg-primary text-background-dark font-bold text-sm">All</button>
-<button class="px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Housing</button>
-<button class="px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Food</button>
-<button class="px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Transport</button>
-<button class="px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Entertainment</button>
+<button class="filter-pill px-6 py-2 rounded-full bg-primary text-background-dark font-bold text-sm">All</button>
+<button class="filter-pill px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Housing</button>
+<button class="filter-pill px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Food</button>
+<button class="filter-pill px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Transport</button>
+<button class="filter-pill px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Entertainment</button>
+<button class="filter-pill px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Technology</button>
+<button class="filter-pill px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all">Other</button>
 </div>
 <!-- Expenses Table -->
 <div class="glass rounded-xl overflow-hidden border-white/10">
@@ -191,47 +193,25 @@
                             <span class="material-symbols-outlined text-slate-500">info</span>
 </h4>
 <div class="relative flex justify-center py-6">
-<!-- SVG Donut Chart Placeholder -->
-<div class="size-48 rounded-full border-[16px] border-slate-800 relative flex items-center justify-center">
-<div class="absolute inset-0 rounded-full border-[16px] border-transparent border-t-primary border-r-primary rotate-45"></div>
-<div class="absolute inset-0 rounded-full border-[16px] border-transparent border-l-purple-500 -rotate-12"></div>
-<div class="text-center">
-<p class="text-2xl font-black text-white">100%</p>
+<svg id="donutChart" width="192" height="192" viewBox="0 0 42 42" class="circular-chart">
+<circle class="donut-hole" cx="21" cy="21" r="15.9" fill="transparent"></circle>
+<circle class="donut-ring" cx="21" cy="21" r="15.9" fill="transparent" stroke="#1e293b" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center text-center">
+<div>
+<p id="donutPctLabel" class="text-2xl font-black text-white">0%</p>
 <p class="text-[10px] uppercase text-slate-500 tracking-tighter">Budget Used</p>
 </div>
 </div>
 </div>
-<div class="space-y-4 mt-8">
-<div class="flex items-center justify-between text-sm">
-<div class="flex items-center gap-2">
-<div class="size-2 rounded-full bg-primary shadow-[0_0_8px_#00eeff]"></div>
-<span class="text-slate-400 font-medium">Housing</span>
-</div>
-<span class="text-white font-bold">45%</span>
-</div>
-<div class="flex items-center justify-between text-sm">
-<div class="flex items-center gap-2">
-<div class="size-2 rounded-full bg-purple-500 shadow-[0_0_8px_#a855f7]"></div>
-<span class="text-slate-400 font-medium">Food</span>
-</div>
-<span class="text-white font-bold">25%</span>
-</div>
-<div class="flex items-center justify-between text-sm">
-<div class="flex items-center gap-2">
-<div class="size-2 rounded-full bg-slate-700"></div>
-<span class="text-slate-400 font-medium">Other</span>
-</div>
-<span class="text-white font-bold">30%</span>
-</div>
-</div>
+<div id="distributionLegend" class="space-y-4 mt-8"></div>
 </div>
 <div class="glass p-6 rounded-xl border-white/10 relative overflow-hidden group">
 <div class="absolute top-0 right-0 p-4">
 <span class="material-symbols-outlined text-primary/20 text-4xl group-hover:scale-125 transition-transform">insights</span>
 </div>
 <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Smart Suggestion</h4>
-                            You've spent <span class="text-primary">₹200 less</span> on transport this month compared to average. Consider moving this to your <span id="savingsVaultLink" class="text-purple-400 underline decoration-purple-400/30 underline-offset-4 cursor-pointer hover:text-purple-300 transition-colors">Savings Vault</span>.
-                        </p>
+<p id="smartSuggestion" class="text-slate-300 text-sm leading-relaxed">Add some expenses to see insights here.</p>
 </div>
 </div>
 </div>
@@ -268,156 +248,9 @@
 </div>
 </div>
 
+<script src="api.js"></script>
 <script src="shared_modals.js"></script>
-<script>
-// ── Data Layer (localStorage) ───────────────────────
-const STORE = {
-    get(key, fallback) { try { return JSON.parse(localStorage.getItem('ff_' + key)) || fallback; } catch { return fallback; } },
-    set(key, val) { localStorage.setItem('ff_' + key, JSON.stringify(val)); }
-};
-
-// Migrate legacy key
-if (!localStorage.getItem('ff_userEmail') && localStorage.getItem('ff_email')) {
-    localStorage.setItem('ff_userEmail', localStorage.getItem('ff_email'));
-}
-
-// User Profile
-document.getElementById('sidebarUserName').textContent = STORE.get('userName', (localStorage.getItem('ff_userName') || '').trim() || 'User');
-document.getElementById('sidebarUserEmail').textContent = (localStorage.getItem('ff_userEmail') || '').trim() || '—';
-
-const modal = document.getElementById('expenseModal');
-const catIcons = { Housing: 'home', Food: 'shopping_cart', Transport: 'directions_car', Entertainment: 'movie', Other: 'more_horiz' };
-const catColors = { Housing: 'orange', Food: 'emerald', Transport: 'blue', Entertainment: 'purple', Other: 'slate' };
-
-function renderExpenses() {
-    const allTxns = STORE.get('transactions', []);
-    const expenses = allTxns.filter(t => t.type === 'expense').sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    // Stats
-    const total = expenses.reduce((sum, t) => sum + t.amount, 0);
-    document.getElementById('statTotalExp').innerHTML = `₹${Math.floor(total).toLocaleString()}<span class="text-xl text-primary/50">.${(total%1).toFixed(2).substring(2)}</span>`;
-    document.getElementById('statExpCount').textContent = expenses.length;
-    document.getElementById('statExpAvg').textContent = `Avg. ₹${(total / (expenses.length || 1)).toFixed(2)} per transaction`;
-    
-    // Biggest Category
-    const catMap = {};
-    expenses.forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + t.amount; });
-    let biggestCat = 'None', biggestAmt = 0;
-    for(const [c, a] of Object.entries(catMap)) {
-        if(a > biggestAmt) { biggestAmt = a; biggestCat = c; }
-    }
-    const biggestPct = total > 0 ? Math.round((biggestAmt / total) * 100) : 0;
-    document.getElementById('statBiggestCatName').textContent = biggestCat;
-    document.getElementById('statBiggestCatAmount').textContent = `₹${biggestAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-    document.getElementById('statBiggestCatPct').textContent = `| ${biggestPct}% of total`;
-
-    // Table
-    const tbody = document.getElementById('expenseTbody');
-    tbody.innerHTML = expenses.map(t => {
-        const d = new Date(t.date);
-        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-        const icon = catIcons[t.category] || 'receipt';
-        const color = catColors[t.category] || 'slate';
-        return `<tr class="hover:bg-white/5 transition-all group cursor-pointer" data-category="${t.category}">
-            <td class="px-6 py-6 text-slate-400 text-sm font-medium italic">${dateStr}</td>
-            <td class="px-6 py-6"><div class="flex items-center gap-3">
-                <div class="size-8 rounded-lg bg-${color}-500/20 flex items-center justify-center text-${color}-500">
-                    <span class="material-symbols-outlined text-lg">${icon}</span>
-                </div><span class="font-bold text-white">${t.category}</span></div></td>
-            <td class="px-6 py-6 text-slate-300 font-medium">${t.desc}</td>
-            <td class="px-6 py-6 text-right flex items-center justify-end gap-4 h-full">
-                <span class="text-white font-black text-lg group-hover:text-primary transition-colors">₹${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
-                <button class="delete-exp opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all" data-id="${t.id}">
-                    <span class="material-symbols-outlined text-lg">delete</span>
-                </button>
-            </td>
-        </tr>`;
-    }).join('');
-
-    // Filter reapplies visually
-    applyFilter();
-    
-    // Bind deletes
-    document.querySelectorAll('.delete-exp').forEach(btn => btn.addEventListener('click', async function(e) {
-        e.stopPropagation();
-        if(await window.showAppConfirm('Delete this expense?')) {
-            const id = Number(this.dataset.id);
-            STORE.set('transactions', STORE.get('transactions', []).filter(tx => tx.id !== id));
-            renderExpenses();
-        }
-    }));
-}
-
-// Add Expense button
-document.querySelectorAll('button').forEach(btn => {
-    if (btn.textContent.includes('Add Expense')) {
-        btn.addEventListener('click', () => { modal.classList.remove('hidden'); modal.classList.add('flex'); });
-    }
-});
-document.getElementById('closeExpenseModal').addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex'); });
-modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }});
-
-// Submit expense
-document.getElementById('expenseForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const cat = document.getElementById('expCategory').value;
-    const desc = document.getElementById('expDesc').value;
-    const amount = parseFloat(document.getElementById('expAmount').value);
-    
-    const allTxns = STORE.get('transactions', []);
-    allTxns.push({
-        id: Date.now(),
-        type: 'expense',
-        category: cat,
-        desc: desc,
-        amount: amount,
-        date: new Date().toISOString()
-    });
-    STORE.set('transactions', allTxns);
-    
-    modal.classList.add('hidden'); modal.classList.remove('flex');
-    this.reset();
-    renderExpenses();
-});
-
-// Category filter pills
-let currentFilter = 'All';
-const filterBtns = document.querySelectorAll('button');
-const pills = [];
-filterBtns.forEach(btn => {
-    const t = btn.textContent.trim();
-    if (['All', 'Housing', 'Food', 'Transport', 'Entertainment'].includes(t)) {
-        pills.push(btn);
-    }
-});
-
-function applyFilter() {
-    pills.forEach(b => {
-        if(b.textContent.trim() === currentFilter) {
-            b.className = 'px-6 py-2 rounded-full bg-primary text-background-dark font-bold text-sm';
-        } else {
-            b.className = 'px-6 py-2 rounded-full glass text-slate-300 font-medium text-sm border-white/10 hover:border-primary/50 transition-all';
-        }
-    });
-    document.querySelectorAll('tbody tr').forEach(row => {
-        if (currentFilter === 'All' || row.dataset.category === currentFilter) row.style.display = '';
-        else row.style.display = 'none';
-    });
-}
-
-pills.forEach(btn => {
-    btn.addEventListener('click', function() {
-        currentFilter = this.textContent.trim();
-        applyFilter();
-    });
-});
-
-// Savings Vault link
-document.getElementById('savingsVaultLink')?.addEventListener('click', async () => {
-    await window.showAppAlert('💰 Savings Vault\n\nThis feature will let you automatically redirect excess spending savings into a dedicated vault. Coming in FinanceFlow Pro!');
-});
-
-// Initial load
-renderExpenses();
-</script>
+<script src="expenses.js"></script>
 </body></html>
+
+

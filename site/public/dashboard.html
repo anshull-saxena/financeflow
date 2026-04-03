@@ -131,39 +131,33 @@
 <div class="glass p-8 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-primary/30 transition-all">
 <div class="flex justify-between items-start mb-4">
 <p class="text-slate-400 font-medium">Total Balance</p>
-<span class="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full">+12.5%</span>
+<span id="balanceBadge" class="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full"></span>
 </div>
-<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="balance">₹124,592.00</h2>
+<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="balance">₹0.00</h2>
 <div class="h-12 w-full">
-<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
-<path d="M0 35 Q 25 35, 50 15 T 100 5" fill="none" stroke="#00eeff" stroke-width="2"></path>
-</svg>
+<svg id="balanceSpark" class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40"></svg>
 </div>
 </div>
 <!-- Monthly Income Card -->
 <div class="glass p-8 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-accent-purple/30 transition-all">
 <div class="flex justify-between items-start mb-4">
 <p class="text-slate-400 font-medium">Monthly Income</p>
-<span class="bg-accent-purple/20 text-accent-purple text-xs px-2 py-1 rounded-full">+4.2%</span>
+<span id="incomeBadge" class="bg-accent-purple/20 text-accent-purple text-xs px-2 py-1 rounded-full"></span>
 </div>
-<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="income">₹12,450.00</h2>
+<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="income">₹0.00</h2>
 <div class="h-12 w-full">
-<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
-<path d="M0 25 Q 25 10, 50 25 T 100 15" fill="none" stroke="#a855f7" stroke-width="2"></path>
-</svg>
+<svg id="incomeSpark" class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40"></svg>
 </div>
 </div>
 <!-- Monthly Expenses Card -->
 <div class="glass p-8 rounded-3xl border border-white/10 relative overflow-hidden group hover:border-red-400/30 transition-all">
 <div class="flex justify-between items-start mb-4">
 <p class="text-slate-400 font-medium">Monthly Expenses</p>
-<span class="bg-red-400/20 text-red-400 text-xs px-2 py-1 rounded-full">-2.1%</span>
+<span id="expenseBadge" class="bg-red-400/20 text-red-400 text-xs px-2 py-1 rounded-full"></span>
 </div>
-<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="expenses">₹4,230.00</h2>
+<h2 class="text-4xl font-black text-white mb-6 tracking-tight" data-stat="expenses">₹0.00</h2>
 <div class="h-12 w-full">
-<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40">
-<path d="M0 5 Q 25 30, 50 20 T 100 35" fill="none" stroke="#f87171" stroke-width="2"></path>
-</svg>
+<svg id="expenseSpark" class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 40"></svg>
 </div>
 </div>
 </div>
@@ -172,43 +166,28 @@
 <div class="flex justify-between items-center mb-8">
 <div>
 <h3 class="text-xl font-bold text-white">Portfolio Performance</h3>
-<p class="text-slate-400 text-sm">Real-time growth analysis across all assets</p>
+<p class="text-slate-400 text-sm">Growth analysis based on your transactions</p>
 </div>
-<div class="flex gap-2">
-<button class="px-3 py-1 rounded-lg bg-white/5 text-white text-xs border border-white/10">1D</button>
-<button class="px-3 py-1 rounded-lg bg-primary text-background-dark text-xs font-bold">1W</button>
-<button class="px-3 py-1 rounded-lg bg-white/5 text-white text-xs border border-white/10">1M</button>
-<button class="px-3 py-1 rounded-lg bg-white/5 text-white text-xs border border-white/10">1Y</button>
+<div id="chartPeriodBtns" class="flex gap-2">
+<button class="chart-period-btn px-3 py-1 rounded-lg bg-white/5 text-white text-xs border border-white/10 hover:bg-white/10 transition-colors" data-period="7">1W</button>
+<button class="chart-period-btn px-3 py-1 rounded-lg bg-primary text-background-dark text-xs font-bold transition-colors" data-period="30">1M</button>
+<button class="chart-period-btn px-3 py-1 rounded-lg bg-white/5 text-white text-xs border border-white/10 hover:bg-white/10 transition-colors" data-period="90">3M</button>
+<button class="chart-period-btn px-3 py-1 rounded-lg bg-white/5 text-white text-xs border border-white/10 hover:bg-white/10 transition-colors" data-period="365">1Y</button>
 </div>
 </div>
 <div class="w-full h-[320px] relative">
-<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 300">
+<svg id="portfolioChart" class="w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 300">
 <defs>
 <lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
 <stop offset="0%" stop-color="#a855f7" stop-opacity="0.5"></stop>
 <stop offset="100%" stop-color="#00eeff" stop-opacity="0"></stop>
 </lineargradient>
 </defs>
-<path d="M0 250 C 150 230, 250 100, 400 150 S 650 50, 800 80 S 1000 20, 1000 20 L 1000 300 L 0 300 Z" fill="url(#chartGradient)"></path>
-<path d="M0 250 C 150 230, 250 100, 400 150 S 650 50, 800 80 S 1000 20, 1000 20" fill="none" stroke="#a855f7" stroke-linecap="round" stroke-width="4"></path>
 </svg>
 <!-- Y-Axis Labels -->
-<div class="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-slate-500 font-bold uppercase tracking-widest pb-6">
-<span>₹150k</span>
-<span>₹100k</span>
-<span>₹50k</span>
-<span>₹0</span>
-</div>
+<div id="chartYAxis" class="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-slate-500 font-bold uppercase tracking-widest pb-6"></div>
 <!-- X-Axis Labels -->
-<div class="flex justify-between mt-4 text-[11px] text-slate-400 font-bold uppercase tracking-wider px-2">
-<span>Mon</span>
-<span>Tue</span>
-<span>Wed</span>
-<span>Thu</span>
-<span>Fri</span>
-<span>Sat</span>
-<span>Sun</span>
-</div>
+<div id="chartXAxis" class="flex justify-between mt-4 text-[11px] text-slate-400 font-bold uppercase tracking-wider px-2"></div>
 </div>
 </div>
 <!-- Recent Transactions -->
@@ -246,7 +225,7 @@
 <div class="flex justify-between items-end mt-4">
 <div>
 <p class="text-white/50 text-[10px] uppercase font-bold">Card Holder</p>
-<p class="text-white text-sm font-bold">ALEXANDER R.</p>
+<p id="cardHolderName" class="text-white text-sm font-bold">—</p>
 </div>
 <div class="w-10 h-6 bg-orange-500/80 rounded-md"></div>
 </div>
@@ -327,283 +306,9 @@
 </div>
 </div>
 
+<script src="api.js"></script>
 <script src="shared_modals.js"></script>
-<script>
-// ── Data Layer (localStorage) ───────────────────────
-const STORE = {
-    get(key, fallback) { try { return JSON.parse(localStorage.getItem('ff_' + key)) || fallback; } catch { return fallback; } },
-    set(key, val) { localStorage.setItem('ff_' + key, JSON.stringify(val)); }
-};
-
-const ICONS = { Salary:'payments', Freelance:'work', Investment:'show_chart', Food:'restaurant', Housing:'home', Transport:'flight', Entertainment:'movie', Technology:'shopping_bag', Other:'more_horiz' };
-
-// ── Rendering ───────────────────────────────────────
-function render() {
-    const txns = STORE.get('transactions', []);
-    const goals = STORE.get('goals', []);
-    const totalIncome = txns.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-    const totalExpense = txns.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-    const balance = totalIncome - totalExpense;
-
-    // User Profile
-    const rawName = (localStorage.getItem('ff_userName') || '').trim();
-    const firstName = rawName ? rawName.split(' ')[0] : 'there';
-    document.getElementById('dashboardGreeting').textContent = `Welcome back, ${firstName}!`;
-
-    // Stats
-    document.querySelector('[data-stat="balance"]').textContent = '₹' + balance.toLocaleString('en-US', { minimumFractionDigits: 2 });
-    document.querySelector('[data-stat="income"]').textContent = '₹' + totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2 });
-    document.querySelector('[data-stat="expenses"]').textContent = '₹' + totalExpense.toLocaleString('en-US', { minimumFractionDigits: 2 });
-
-    // Transactions
-    const tbody = document.getElementById('txnBody');
-    const recentTxns = txns
-        .slice()
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 8);
-    if (recentTxns.length === 0) {
-        tbody.innerHTML = `<div class="glass p-6 rounded-2xl border border-white/10 text-center">
-            <p class="text-white font-bold mb-1">No transactions yet</p>
-            <p class="text-slate-400 text-sm">Click <span class="text-primary font-semibold">New Transaction</span> to add your first income or expense.</p>
-        </div>`;
-    } else {
-        tbody.innerHTML = recentTxns.map(t => {
-        const d = new Date(t.date);
-        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        const icon = ICONS[t.category] || 'receipt';
-        const isIncome = t.type === 'income';
-        const iconBg = isIncome ? 'bg-primary/10 text-primary' : 'bg-slate-800 text-white';
-        const amtColor = isIncome ? 'text-primary' : 'text-white';
-        const amtPrefix = isIncome ? '+' : '-';
-        return `<div class="glass flex items-center justify-between p-5 rounded-2xl border border-white/5 hover:border-primary/20 hover:bg-white/10 transition-all cursor-pointer group">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center">
-                    <span class="material-symbols-outlined">${icon}</span>
-                </div>
-                <div>
-                    <p class="text-white font-bold">${t.desc}</p>
-                    <p class="text-slate-400 text-sm">${t.category}</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <p class="${amtColor} font-bold">${amtPrefix}₹${t.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-                    <p class="text-slate-500 text-xs uppercase font-bold mt-1">${dateStr}</p>
-                </div>
-                <button class="delete-txn opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all" data-id="${t.id}">
-                    <span class="material-symbols-outlined text-lg">delete</span>
-                </button>
-            </div>
-        </div>`;
-        }).join('');
-    }
-
-    // Goals
-    const gc = document.getElementById('goalsContainer');
-    if (goals.length === 0) {
-        gc.innerHTML = `<div class="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
-            <p class="text-white font-bold mb-1">No goals yet</p>
-            <p class="text-slate-400 text-sm">Click the <span class="text-primary font-semibold">+</span> button to create your first goal.</p>
-        </div>`;
-        return;
-    }
-    gc.innerHTML = goals.map(g => {
-        const pct = Math.min(100, Math.round((g.saved / g.target) * 100));
-        const colorClass = g.color === 'purple' ? 'accent-purple' : 'primary';
-        const barShadow = g.color === 'purple' ? 'shadow-[0_0_10px_#a855f7]' : 'neon-glow';
-        return `<div class="p-5 rounded-2xl bg-white/5 border border-white/10 group hover:border-${colorClass}/30 transition-all cursor-pointer" data-goal-id="${g.id}">
-            <div class="flex justify-between items-center mb-4">
-                <p class="text-sm font-semibold text-white">${g.name}</p>
-                <div class="flex items-center gap-2">
-                    <p class="text-xs text-${colorClass}">${pct}%</p>
-                    <button class="edit-goal opacity-0 group-hover:opacity-100 text-slate-500 hover:text-primary transition-all" data-id="${g.id}"><span class="material-symbols-outlined text-sm">edit</span></button>
-                    <button class="delete-goal opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all" data-id="${g.id}"><span class="material-symbols-outlined text-sm">delete</span></button>
-                </div>
-            </div>
-            <div class="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                <div class="bg-${colorClass} h-full ${barShadow} transition-all duration-700" style="width: ${pct}%"></div>
-            </div>
-            <div class="flex justify-between mt-3">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Saved: ₹${g.saved.toLocaleString()}</p>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target: ₹${g.target.toLocaleString()}</p>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-// Global Event Listeners for Dynamic Data Elements
-document.getElementById('goalsContainer').addEventListener('click', async e => {
-    const delBtn = e.target.closest('.delete-goal');
-    const editBtn = e.target.closest('.edit-goal');
-    
-    if (delBtn) {
-        e.stopPropagation();
-        const id = Number(delBtn.dataset.id);
-        if (await window.showAppConfirm('Delete this goal?')) {
-            STORE.set('goals', STORE.get('goals', []).filter(g => g.id !== id));
-            render();
-        }
-    } else if (editBtn) {
-        e.stopPropagation();
-        const id = Number(editBtn.dataset.id);
-        const goal = STORE.get('goals', []).find(g => g.id === id);
-        if (goal) openGoalModal(goal);
-    }
-});
-
-document.getElementById('txnBody').addEventListener('click', async e => {
-    const delBtn = e.target.closest('.delete-txn');
-    if (delBtn) {
-        e.stopPropagation();
-        const id = Number(delBtn.dataset.id);
-        if (await window.showAppConfirm('Delete this transaction?')) {
-            STORE.set('transactions', STORE.get('transactions', []).filter(t => t.id !== id));
-            render();
-        }
-    }
-});
-
-// ── Transaction Modal ───────────────────────────────
-const txnModal = document.getElementById('txnModal');
-// Bind the "New Transaction" button robustly by text content
-document.querySelectorAll('header button').forEach(btn => {
-    if (btn.textContent.includes('New Transaction')) {
-        btn.addEventListener('click', () => {
-            txnModal.classList.remove('hidden');
-            txnModal.classList.add('flex');
-        });
-    }
-});
-document.getElementById('closeTxnModal').addEventListener('click', () => { txnModal.classList.add('hidden'); txnModal.classList.remove('flex'); });
-txnModal.addEventListener('click', e => { if (e.target === txnModal) { txnModal.classList.add('hidden'); txnModal.classList.remove('flex'); }});
-
-document.querySelectorAll('.txn-type-btn').forEach(btn => btn.addEventListener('click', () => {
-    document.querySelectorAll('.txn-type-btn').forEach(b => { b.classList.remove('bg-primary', 'text-background-dark'); b.classList.add('bg-white/5', 'text-slate-300', 'border', 'border-white/10'); });
-    btn.classList.add('bg-primary', 'text-background-dark'); btn.classList.remove('bg-white/5', 'text-slate-300', 'border', 'border-white/10');
-    document.getElementById('txnType').value = btn.dataset.type;
-}));
-
-document.getElementById('txnForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const txns = STORE.get('transactions', []);
-    txns.push({
-        id: Date.now(),
-        type: document.getElementById('txnType').value,
-        desc: document.getElementById('txnDesc').value,
-        category: document.getElementById('txnCategory').value,
-        amount: parseFloat(document.getElementById('txnAmount').value),
-        date: new Date().toISOString()
-    });
-    STORE.set('transactions', txns);
-    txnModal.classList.add('hidden'); txnModal.classList.remove('flex');
-    e.target.reset();
-    document.getElementById('txnType').value = 'income';
-    document.querySelectorAll('.txn-type-btn')[0].click();
-    render();
-});
-
-// ── Goal Modal ──────────────────────────────────────
-const goalModal = document.getElementById('goalModal');
-function openGoalModal(goal = null) {
-    if (goal) {
-        document.getElementById('goalModalTitle').textContent = 'Edit Goal';
-        document.getElementById('goalSubmitBtn').textContent = 'Save Changes';
-        document.getElementById('goalEditId').value = goal.id;
-        document.getElementById('goalName').value = goal.name;
-        document.getElementById('goalTarget').value = goal.target;
-        document.getElementById('goalSaved').value = goal.saved;
-    } else {
-        document.getElementById('goalModalTitle').textContent = 'New Financial Goal';
-        document.getElementById('goalSubmitBtn').textContent = 'Create Goal';
-        document.getElementById('goalEditId').value = '';
-        document.getElementById('goalForm').reset();
-    }
-    goalModal.classList.remove('hidden'); goalModal.classList.add('flex');
-}
-document.getElementById('addGoalBtn').addEventListener('click', () => openGoalModal());
-document.getElementById('closeGoalModal').addEventListener('click', () => { goalModal.classList.add('hidden'); goalModal.classList.remove('flex'); });
-goalModal.addEventListener('click', e => { if (e.target === goalModal) { goalModal.classList.add('hidden'); goalModal.classList.remove('flex'); }});
-
-document.getElementById('goalForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const goals = STORE.get('goals', []);
-    const editId = document.getElementById('goalEditId').value;
-    const colors = ['primary', 'purple'];
-    if (editId) {
-        const idx = goals.findIndex(g => g.id === Number(editId));
-        if (idx !== -1) {
-            goals[idx].name = document.getElementById('goalName').value;
-            goals[idx].target = parseFloat(document.getElementById('goalTarget').value);
-            goals[idx].saved = parseFloat(document.getElementById('goalSaved').value);
-        }
-    } else {
-        goals.push({
-            id: Date.now(),
-            name: document.getElementById('goalName').value,
-            target: parseFloat(document.getElementById('goalTarget').value),
-            saved: parseFloat(document.getElementById('goalSaved').value),
-            color: colors[goals.length % 2]
-        });
-    }
-    STORE.set('goals', goals);
-    goalModal.classList.add('hidden'); goalModal.classList.remove('flex');
-    render();
-});
-
-// ── Init ────────────────────────────────────────────
-render();
-
-// ── Fix remaining dead elements ─────────────────────
-// "View All History" link
-document.querySelectorAll('a').forEach(a => {
-    if (a.textContent.includes('View All History')) {
-        a.href = 'income.html';
-    }
-});
-
-const chartButtons = document.querySelectorAll('.bg-white\\/5.text-white, .bg-primary.text-background-dark');
-chartButtons.forEach(btn => {
-    const txt = btn.textContent.trim();
-    if (['1D', '1W', '1M', '1Y'].includes(txt)) {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            this.parentElement.querySelectorAll('button').forEach(b => {
-                b.className = 'px-3 py-1 rounded-lg bg-white/5 text-white text-xs border border-white/10 hover:bg-white/10 transition-colors';
-            });
-            this.className = 'px-3 py-1 rounded-lg bg-primary text-background-dark text-xs font-bold transition-colors';
-        });
-    }
-});
-
-// "Last 30 Days" button
-document.getElementById('dateRangeBtn')?.addEventListener('click', function() {
-    const options = ['Last 7 Days', 'Last 30 Days', 'Last 90 Days', 'This Year'];
-    const span = document.getElementById('dateRangeText');
-    const idx = options.indexOf(span.textContent);
-    span.textContent = options[(idx + 1) % options.length];
-});
-
-// Add Goal button
-document.getElementById('addGoalBtn')?.addEventListener('click', () => {
-    document.getElementById('goalModalTitle').textContent = 'New Financial Goal';
-    document.getElementById('goalSubmitBtn').textContent = 'Create Goal';
-    document.getElementById('goalEditId').value = '';
-    document.getElementById('goalForm').reset();
-    goalModal.classList.remove('hidden'); goalModal.classList.add('flex');
-});
-
-// Linked Card click
-document.querySelectorAll('.group.cursor-pointer').forEach(el => {
-    if (el.textContent.includes('PREMIUM BLACK')) {
-        el.addEventListener('click', async () => {
-            await window.showAppAlert('💳 Linked Cards\n\nManage multiple linked accounts, monitor balances in real-time, and transfer funds instantly. Coming in FinanceFlow Pro!');
-        });
-    }
-});
-
-// "Upgrade Now" button
-document.getElementById('upgradeProBtnSidebar')?.addEventListener('click', async function() {
-    await window.showAppAlert('🎉 Premium upgrade coming soon!\n\nAdvanced analytics, crypto-wallet integration, and AI-powered insights will be available in FinanceFlow Pro.');
-});
-</script>
+<script src="dashboard.js"></script>
 </body></html>
+
+

@@ -121,6 +121,12 @@
 </div>
 </div>
 <div class="space-y-2">
+<label class="text-slate-300 text-sm font-medium ml-1">Password</label>
+<div class="relative group">
+<input id="obPassword" required class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all" placeholder="Create a secure password" type="password"/>
+</div>
+</div>
+<div class="space-y-2">
 <label class="text-slate-300 text-sm font-medium ml-1">Primary Currency</label>
 <div class="relative">
 <select id="obCurrency" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white appearance-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all">
@@ -160,6 +166,7 @@
 </div>
 </main>
 <div class="fixed top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 blur-[120px] rounded-full z-0 pointer-events-none"></div>
+<script src="api.js"></script>
 <script src="shared_modals.js"></script>
 <script>
     const currencyMap = { 'USD': '₹', 'EUR': '€', 'GBP': '£', 'INR': '₹' };
@@ -180,18 +187,42 @@
 
     document.getElementById('onboardingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const name = document.getElementById('obName').value;
-        const email = document.getElementById('obEmail').value;
+        const name = document.getElementById('obName').value.trim();
+        const email = document.getElementById('obEmail').value.trim();
+        const password = document.getElementById('obPassword').value;
         const cur = document.getElementById('obCurrency').value;
         const goal = document.getElementById('obGoal').value;
+        const submitBtn = this.querySelector('button[type="submit"]');
         
-        localStorage.setItem('ff_userName', name);
-        localStorage.setItem('ff_userEmail', email);
-        localStorage.setItem('ff_currency', cur);
-        localStorage.setItem('ff_monthlyGoal', goal);
-        
-        await window.showAppAlert('Profile saved! Redirecting to your dashboard...', 'Success');
-        window.location.href = 'dashboard.html';
+        try {
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+            
+            // 1. Create the account
+            const sigReq = await API.post('/auth/signup', { name, email, password });
+            API.setToken(sigReq.token);
+            
+            // 2. Set the initial user settings
+            await API.put('/settings', {
+                currency: cur,
+                monthlyGoal: goal,
+                emailNotif: true,
+                darkMode: true,
+                twoFactor: false
+            });
+
+            // Local fallback caching
+            localStorage.setItem('ff_userName', name);
+            localStorage.setItem('ff_userEmail', email);
+
+            await window.showAppAlert('Profile saved! Redirecting to your dashboard...', 'Success');
+            window.location.href = 'dashboard.html';
+        } catch(error) {
+            window.showAppAlert(error.message || 'Signup failed', 'Error');
+        } finally {
+            submitBtn.textContent = 'Complete Setup';
+            submitBtn.disabled = false;
+        }
     });
 
     document.getElementById('obSkip').addEventListener('click', async function() {

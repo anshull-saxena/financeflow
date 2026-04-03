@@ -38,10 +38,10 @@ export async function query(sql, params) {
   if (!p) return null;
   
   try {
-    const [rows] = await p.execute(sql, params);
+    const [rows] = await p.execute(sql, params || []);
     return rows;
   } catch (error) {
-    console.error('Database query error:', error.message);
+    console.error('Database query error:', error.message, 'SQL:', sql, 'PARAMS:', params);
     return null;
   }
 }
