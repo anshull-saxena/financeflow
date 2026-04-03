@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { randomUUID } from 'crypto';
+import bcrypt from 'bcryptjs';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { getPool, query } from './db/connection.mjs';
 
 dotenv.config();
 
@@ -14,302 +16,367 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors({ origin: '*', credentials: true }));
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : ['http://localhost:3001', 'http://127.0.0.1:3001'];
+
+app.use(cors({
+  origin(origin, cb) {
+    // Allow requests with no origin (mobile apps, curl, same-origin requests)
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error('CORS: origin not allowed'));
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files
-app.use('/static', express.static(path.join(__dirname, '../../financeflow')));
+// Rate limiting for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests, please try again later.' }
+});
 
-// Initialize database connection
-let useMySQL = false;
-(async () => {
-  const pool = await getPool();
-  useMySQL = pool !== null;
-  if (useMySQL) {
-    console.log('📊 Using MySQL database');
-  } else {
-    console.log('💾 Using in-memory storage (run setup-mysql.sh to enable MySQL)');
+// Serve static frontend files from site/public
+app.use(express.static(path.join(__dirname, '../../site/public')));
+
+// In-memory storage (no hardcoded demo data)
+const users = new Map();      // userId -> { id, name, email, passwordHash, settings }
+const sessions = new Map();   // token  -> userId
+const userTransactions = new Map(); // userId -> transaction[]
+const userGoals = new Map();        // userId -> goal[]
+
+function hashPassword(password) {
+  return bcrypt.hashSync(password, 12);
+}
+
+function verifyPassword(password, hash) {
+  return bcrypt.compareSync(password, hash);
+}
+
+function requireAuth(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, error: 'Not authenticated' });
   }
-})();
-
-// Mock database (in production, this would be MySQL)
-let transactions = [
-  { id: 1, type: 'expense', description: 'Apple Store', category: 'Technology', amount: 1299, currency: 'INR', occurredAt: '2023-10-24T14:45:00.000Z' },
-  { id: 2, type: 'income', description: 'Monthly Salary', category: 'Salary', amount: 12450, currency: 'INR', occurredAt: '2023-10-01T09:00:00.000Z' },
-  { id: 3, type: 'expense', description: 'Lumière Dining', category: 'Food', amount: 240, currency: 'INR', occurredAt: '2023-09-30T20:15:00.000Z' },
-  { id: 4, type: 'expense', description: 'Electric Utility', category: 'Housing', amount: 112, currency: 'INR', occurredAt: '2023-09-21T10:30:00.000Z' },
-  { id: 5, type: 'expense', description: 'Skyline Airways', category: 'Transport', amount: 850, currency: 'INR', occurredAt: '2023-09-28T11:30:00.000Z' },
-  { id: 6, type: 'expense', description: 'Grocery Shopping', category: 'Food', amount: 450, currency: 'INR', occurredAt: '2023-10-15T10:30:00.000Z' },
-  { id: 7, type: 'expense', description: 'Gas Station', category: 'Transport', amount: 120, currency: 'INR', occurredAt: '2023-10-18T08:15:00.000Z' },
-  { id: 8, type: 'income', description: 'Freelance Project', category: 'Income', amount: 5000, currency: 'INR', occurredAt: '2023-10-10T14:00:00.000Z' },
-];
-
-let goals = [
-  { id: 1, name: 'New Porsche 911', targetAmount: 160000, savedAmount: 104000, currency: 'INR' },
-  { id: 2, name: 'Tokyo Trip', targetAmount: 12000, savedAmount: 11040, currency: 'INR' }
-];
-
-let user = {
-  id: '1',
-  name: 'Demo User',
-  email: 'demo@financeflow.local',
-  settings: {
-    currency: 'INR',
-    monthlyGoal: 10000,
-    emailNotif: true,
-    darkMode: true,
-    twoFactor: false
+  const token = auth.slice(7);
+  const userId = sessions.get(token);
+  if (!userId) {
+    return res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
-};
+  req.userId = userId;
+  next();
+}
 
-// Helper functions
+function getUserTransactions(userId) {
+  if (!userTransactions.has(userId)) userTransactions.set(userId, []);
+  return userTransactions.get(userId);
+}
+
+function getUserGoals(userId) {
+  if (!userGoals.has(userId)) userGoals.set(userId, []);
+  return userGoals.get(userId);
+}
+
 function calculateStats(txs) {
   const totalIncome = txs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
   const totalExpenses = txs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
   const balance = totalIncome - totalExpenses;
   const savingsRate = totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0;
-  
-  // Monthly data (last 6 months)
-  const monthlyData = [
-    { month: 'Jan', income: 12000, expenses: 3200 },
-    { month: 'Feb', income: 11800, expenses: 2900 },
-    { month: 'Mar', income: 12200, expenses: 3100 },
-    { month: 'Apr', income: 12450, expenses: 3589 },
-    { month: 'May', income: 12300, expenses: 2800 },
-    { month: 'Jun', income: totalIncome, expenses: totalExpenses }
-  ];
-  
-  // Category breakdown
+
   const categoryTotals = {};
   txs.filter(t => t.type === 'expense').forEach(t => {
     categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
   });
-  
+
   const categoryBreakdown = Object.entries(categoryTotals)
     .map(([category, amount]) => ({
       category,
       amount,
-      percentage: Math.round((amount / totalExpenses) * 100)
+      percentage: totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0
     }))
     .sort((a, b) => b.amount - a.amount);
-  
-  return { totalIncome, totalExpenses, balance, savingsRate, monthlyData, categoryBreakdown };
+
+  return { totalIncome, totalExpenses, balance, savingsRate, categoryBreakdown };
 }
-
-// Routes
-
-// Serve pages
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/dashboard/code.html')));
-app.get('/expenses', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/expenses_page/expenses-dynamic.html')));
-app.get('/income', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/income_page/income-dynamic.html')));
-app.get('/analytics', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/reports_analytics/analytics-dynamic.html')));
-app.get('/settings', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/settings/settings-dynamic.html')));
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/auth/login.html')));
-app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/auth/signup.html')));
 
 // API: Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'FinanceFlow API' });
 });
 
-// API: Dashboard
-app.get('/api/dashboard', (req, res) => {
-  const stats = calculateStats(transactions);
+// API: Auth - Login
+app.post('/api/auth/login', authLimiter, (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ success: false, error: 'Email and password are required' });
+  }
+
+  let foundUser = null;
+  for (const u of users.values()) {
+    if (u.email.toLowerCase() === email.toLowerCase()) {
+      foundUser = u;
+      break;
+    }
+  }
+
+  if (!foundUser || !verifyPassword(password, foundUser.passwordHash)) {
+    return res.status(401).json({ success: false, error: 'Invalid email or password' });
+  }
+
+  const token = randomUUID();
+  sessions.set(token, foundUser.id);
+
   res.json({
     success: true,
     data: {
-      user: { id: user.id, name: user.name, email: user.email },
+      token,
+      user: { id: foundUser.id, name: foundUser.name, email: foundUser.email }
+    }
+  });
+});
+
+// API: Auth - Signup
+app.post('/api/auth/signup', authLimiter, (req, res) => {
+  const { name, email, password, currency = 'INR', monthlyGoal = 0 } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ success: false, error: 'Name, email, and password are required' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+  }
+
+  for (const u of users.values()) {
+    if (u.email.toLowerCase() === email.toLowerCase()) {
+      return res.status(409).json({ success: false, error: 'An account with this email already exists' });
+    }
+  }
+
+  const id = randomUUID();
+  const newUser = {
+    id,
+    name,
+    email,
+    passwordHash: hashPassword(password),
+    settings: {
+      currency,
+      monthlyGoal: parseFloat(monthlyGoal) || 0,
+      emailNotif: true,
+      darkMode: true,
+      twoFactor: false
+    }
+  };
+  users.set(id, newUser);
+  userTransactions.set(id, []);
+  userGoals.set(id, []);
+
+  const token = randomUUID();
+  sessions.set(token, id);
+
+  res.status(201).json({
+    success: true,
+    data: { token, user: { id, name, email } }
+  });
+});
+
+// API: Auth - Logout
+app.post('/api/auth/logout', requireAuth, (req, res) => {
+  const token = req.headers.authorization.slice(7);
+  sessions.delete(token);
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// API: Auth - Change password
+app.put('/api/auth/password', requireAuth, authLimiter, (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const u = users.get(req.userId);
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ success: false, error: 'Current password and new password are required' });
+  }
+  if (!verifyPassword(currentPassword, u.passwordHash)) {
+    return res.status(401).json({ success: false, error: 'Current password is incorrect' });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ success: false, error: 'New password must be at least 6 characters' });
+  }
+
+  u.passwordHash = hashPassword(newPassword);
+  res.json({ success: true, message: 'Password updated successfully' });
+});
+
+// API: Dashboard
+app.get('/api/dashboard', requireAuth, (req, res) => {
+  const u = users.get(req.userId);
+  const txs = getUserTransactions(req.userId);
+  const goals = getUserGoals(req.userId);
+  const stats = calculateStats(txs);
+
+  res.json({
+    success: true,
+    data: {
+      user: { id: u.id, name: u.name, email: u.email },
       stats: {
         ...stats,
-        recentTransactions: transactions.slice(0, 5).map(t => ({
-          ...t,
-          amount: t.type === 'income' ? t.amount : -t.amount
-        }))
+        recentTransactions: txs
+          .slice()
+          .sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt))
+          .slice(0, 8)
       },
       goals: goals.map(g => ({
         ...g,
-        progress: Math.round((g.savedAmount / g.targetAmount) * 100)
+        progress: g.targetAmount > 0 ? Math.round((g.savedAmount / g.targetAmount) * 100) : 0
       }))
     }
   });
 });
 
 // API: Get all transactions
-app.get('/api/transactions', (req, res) => {
-  const { type, category, search, limit = 50, offset = 0 } = req.query;
-  
-  let filtered = [...transactions];
-  
+app.get('/api/transactions', requireAuth, (req, res) => {
+  const { type, category, search, limit = 100, offset = 0 } = req.query;
+
+  let filtered = [...getUserTransactions(req.userId)];
+
   if (type) filtered = filtered.filter(t => t.type === type);
   if (category) filtered = filtered.filter(t => t.category === category);
-  if (search) filtered = filtered.filter(t => 
+  if (search) filtered = filtered.filter(t =>
     t.description.toLowerCase().includes(search.toLowerCase())
   );
-  
+
   const total = filtered.length;
   const results = filtered
     .sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt))
     .slice(parseInt(offset), parseInt(offset) + parseInt(limit));
-  
+
   res.json({
     success: true,
-    data: {
-      transactions: results,
-      total,
-      limit: parseInt(limit),
-      offset: parseInt(offset)
-    }
+    data: { transactions: results, total, limit: parseInt(limit), offset: parseInt(offset) }
   });
 });
 
-// API: Get single transaction
-app.get('/api/transactions/:id', (req, res) => {
-  const tx = transactions.find(t => t.id === parseInt(req.params.id));
-  if (!tx) return res.status(404).json({ success: false, error: 'Transaction not found' });
-  res.json({ success: true, data: tx });
-});
-
 // API: Create transaction
-app.post('/api/transactions', (req, res) => {
-  const { type, description, category, amount, currency = 'INR', occurredAt } = req.body;
-  
+app.post('/api/transactions', requireAuth, (req, res) => {
+  const { type, description, category, amount, currency, occurredAt } = req.body;
+
   if (!type || !description || !category || !amount) {
-    return res.status(400).json({ success: false, error: 'Missing required fields' });
+    return res.status(400).json({ success: false, error: 'Missing required fields: type, description, category, amount' });
   }
-  
+
+  const u = users.get(req.userId);
+  const txs = getUserTransactions(req.userId);
   const newTx = {
-    id: Math.max(...transactions.map(t => t.id)) + 1,
+    id: randomUUID(),
+    userId: req.userId,
     type,
     description,
     category,
     amount: parseFloat(amount),
-    currency,
+    currency: currency || u?.settings?.currency || 'INR',
     occurredAt: occurredAt || new Date().toISOString()
   };
-  
-  transactions.push(newTx);
+  txs.push(newTx);
+
   res.status(201).json({ success: true, data: newTx });
 });
 
-// API: Update transaction
-app.put('/api/transactions/:id', (req, res) => {
-  const index = transactions.findIndex(t => t.id === parseInt(req.params.id));
-  if (index === -1) return res.status(404).json({ success: false, error: 'Transaction not found' });
-  
-  transactions[index] = { ...transactions[index], ...req.body, id: transactions[index].id };
-  res.json({ success: true, data: transactions[index] });
-});
-
 // API: Delete transaction
-app.delete('/api/transactions/:id', (req, res) => {
-  const index = transactions.findIndex(t => t.id === parseInt(req.params.id));
+app.delete('/api/transactions/:id', requireAuth, (req, res) => {
+  const txs = getUserTransactions(req.userId);
+  const index = txs.findIndex(t => t.id === req.params.id);
   if (index === -1) return res.status(404).json({ success: false, error: 'Transaction not found' });
-  
-  transactions.splice(index, 1);
+  txs.splice(index, 1);
   res.json({ success: true, message: 'Transaction deleted' });
 });
 
-// API: Get analytics
-app.get('/api/analytics', (req, res) => {
-  const stats = calculateStats(transactions);
-  
-  // Weekly trend
-  const weeklyTrend = [
-    { week: 'Week 1', income: 3200, expenses: 800 },
-    { week: 'Week 2', income: 2800, expenses: 900 },
-    { week: 'Week 3', income: 3500, expenses: 950 },
-    { week: 'Week 4', income: 2950, expenses: 940 }
-  ];
-  
-  res.json({
-    success: true,
-    data: {
-      ...stats,
-      weeklyTrend,
-      topExpenseCategories: stats.categoryBreakdown.slice(0, 5)
-    }
-  });
-});
-
 // API: Get goals
-app.get('/api/goals', (req, res) => {
+app.get('/api/goals', requireAuth, (req, res) => {
+  const goals = getUserGoals(req.userId);
   res.json({
     success: true,
     data: goals.map(g => ({
       ...g,
-      progress: Math.round((g.savedAmount / g.targetAmount) * 100)
+      progress: g.targetAmount > 0 ? Math.round((g.savedAmount / g.targetAmount) * 100) : 0
     }))
   });
 });
 
-// API: Update goal progress
-app.put('/api/goals/:id', (req, res) => {
-  const index = goals.findIndex(g => g.id === parseInt(req.params.id));
+// API: Create goal
+app.post('/api/goals', requireAuth, (req, res) => {
+  const { name, targetAmount, savedAmount = 0, currency } = req.body;
+  if (!name || !targetAmount) {
+    return res.status(400).json({ success: false, error: 'Missing required fields: name, targetAmount' });
+  }
+
+  const u = users.get(req.userId);
+  const goals = getUserGoals(req.userId);
+  const newGoal = {
+    id: randomUUID(),
+    userId: req.userId,
+    name,
+    targetAmount: parseFloat(targetAmount),
+    savedAmount: parseFloat(savedAmount),
+    currency: currency || u?.settings?.currency || 'INR'
+  };
+  goals.push(newGoal);
+
+  res.status(201).json({ success: true, data: newGoal });
+});
+
+// API: Update goal
+app.put('/api/goals/:id', requireAuth, (req, res) => {
+  const goals = getUserGoals(req.userId);
+  const index = goals.findIndex(g => g.id === req.params.id);
   if (index === -1) return res.status(404).json({ success: false, error: 'Goal not found' });
-  
-  goals[index] = { ...goals[index], ...req.body, id: goals[index].id };
+  goals[index] = { ...goals[index], ...req.body, id: goals[index].id, userId: req.userId };
   res.json({ success: true, data: goals[index] });
 });
 
-// API: Get user settings
-app.get('/api/settings', (req, res) => {
-  res.json({ success: true, data: user });
+// API: Delete goal
+app.delete('/api/goals/:id', requireAuth, (req, res) => {
+  const goals = getUserGoals(req.userId);
+  const index = goals.findIndex(g => g.id === req.params.id);
+  if (index === -1) return res.status(404).json({ success: false, error: 'Goal not found' });
+  goals.splice(index, 1);
+  res.json({ success: true, message: 'Goal deleted' });
 });
 
-// API: Update user settings
-app.put('/api/settings', (req, res) => {
-  user = { ...user, ...req.body };
-  res.json({ success: true, data: user });
+// API: Get settings
+app.get('/api/settings', requireAuth, (req, res) => {
+  const u = users.get(req.userId);
+  res.json({ success: true, data: { id: u.id, name: u.name, email: u.email, settings: u.settings } });
 });
 
-// API: Get categories
-app.get('/api/categories', (req, res) => {
-  const categories = {
-    income: ['Salary', 'Freelance', 'Investment', 'Business', 'Other'],
-    expense: ['Housing', 'Food', 'Transport', 'Technology', 'Entertainment', 'Healthcare', 'Shopping', 'Education', 'Other']
-  };
-  res.json({ success: true, data: categories });
+// API: Update settings
+app.put('/api/settings', requireAuth, (req, res) => {
+  const u = users.get(req.userId);
+  const { name, email, settings } = req.body;
+  if (name) u.name = name;
+  if (email) u.email = email;
+  if (settings) u.settings = { ...u.settings, ...settings };
+  res.json({ success: true, data: { id: u.id, name: u.name, email: u.email, settings: u.settings } });
 });
 
-// API: Login (simple demo - no real authentication)
-app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  
-  // Demo authentication
-  if (email === 'demo@financeflow.local' && password === 'demo123') {
-    res.json({
-      success: true,
-      data: {
-        token: 'demo-token-' + Date.now(),
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email
-        }
-      }
-    });
-  } else {
-    res.status(401).json({ success: false, error: 'Invalid credentials' });
-  }
-});
-
-// API: Signup (simple demo - no real user creation)
-app.post('/api/auth/signup', (req, res) => {
-  const { name, email, password } = req.body;
-  
-  if (!name || !email || !password) {
-    return res.status(400).json({ success: false, error: 'Missing required fields' });
-  }
-  
-  // In a real app, would create user in database
+// API: Analytics
+app.get('/api/analytics', requireAuth, (req, res) => {
+  const txs = getUserTransactions(req.userId);
+  const stats = calculateStats(txs);
   res.json({
     success: true,
-    message: 'Account created successfully',
+    data: { ...stats, topExpenseCategories: stats.categoryBreakdown.slice(0, 5) }
+  });
+});
+
+// API: Categories (public)
+app.get('/api/categories', (req, res) => {
+  res.json({
+    success: true,
     data: {
-      id: Math.floor(Math.random() * 10000),
-      name,
-      email
+      income: ['Salary', 'Freelance', 'Investment', 'Business', 'Other'],
+      expense: ['Housing', 'Food', 'Transport', 'Technology', 'Entertainment', 'Healthcare', 'Shopping', 'Education', 'Other']
     }
   });
 });
@@ -320,26 +387,34 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, error: 'Internal Server Error' });
 });
 
+// 404 for unknown API routes
 app.use((req, res) => {
-  res.status(404).json({ success: false, error: `Route ${req.method} ${req.path} not found` });
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ success: false, error: `Route ${req.method} ${req.path} not found` });
+  }
+  // All other routes serve the frontend
+  res.sendFile(path.join(__dirname, '../../site/public/index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 FinanceFlow API Server running on port ${PORT}`);
-  console.log(`📊 Dashboard: http://localhost:${PORT}/`);
-  console.log(`💰 Expenses: http://localhost:${PORT}/expenses`);
-  console.log(`💵 Income: http://localhost:${PORT}/income`);
-  console.log(`📈 Analytics: http://localhost:${PORT}/analytics`);
-  console.log(`⚙️  Settings: http://localhost:${PORT}/settings`);
+  console.log(`🚀 FinanceFlow Server running on http://localhost:${PORT}`);
   console.log(`\n📡 API Endpoints:`);
-  console.log(`   GET  /api/dashboard`);
-  console.log(`   GET  /api/transactions`);
-  console.log(`   POST /api/transactions`);
-  console.log(`   PUT  /api/transactions/:id`);
+  console.log(`   POST   /api/auth/signup`);
+  console.log(`   POST   /api/auth/login`);
+  console.log(`   POST   /api/auth/logout`);
+  console.log(`   PUT    /api/auth/password`);
+  console.log(`   GET    /api/dashboard`);
+  console.log(`   GET    /api/transactions`);
+  console.log(`   POST   /api/transactions`);
   console.log(`   DELETE /api/transactions/:id`);
-  console.log(`   GET  /api/analytics`);
-  console.log(`   GET  /api/goals`);
-  console.log(`   GET  /api/settings`);
+  console.log(`   GET    /api/goals`);
+  console.log(`   POST   /api/goals`);
+  console.log(`   PUT    /api/goals/:id`);
+  console.log(`   DELETE /api/goals/:id`);
+  console.log(`   GET    /api/settings`);
+  console.log(`   PUT    /api/settings`);
+  console.log(`   GET    /api/analytics`);
+  console.log(`   GET    /api/categories`);
 });
 
 export default app;

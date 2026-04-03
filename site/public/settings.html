@@ -222,20 +222,51 @@
 </div>
 
 <script src="shared_modals.js"></script>
+<script src="api.js"></script>
 <script>
-// Migrate legacy keys
-if (!localStorage.getItem('ff_userEmail') && localStorage.getItem('ff_email')) {
-    localStorage.setItem('ff_userEmail', localStorage.getItem('ff_email'));
+// Auth guard
+if (!window.API.isLoggedIn()) { window.location.href = 'index.html'; }
+
+// Load and display settings
+async function loadSettings() {
+    try {
+        const res = await window.API.getSettings();
+        if (res.success) {
+            const u = res.data;
+            const nameEl = document.getElementById('settingsUserName');
+            const emailEl = document.getElementById('settingsUserEmail');
+            if (nameEl) nameEl.textContent = u.name || 'User';
+            if (emailEl) emailEl.textContent = u.email || '—';
+            localStorage.setItem('ff_userName', u.name || '');
+            localStorage.setItem('ff_userEmail', u.email || '');
+            if (u.settings?.currency) localStorage.setItem('ff_currency', u.settings.currency);
+            if (u.settings?.darkMode !== undefined) {
+                localStorage.setItem('ff_darkMode', u.settings.darkMode);
+            }
+            // Restore toggle states from server
+            const toggleInputs = document.querySelectorAll('input[type="checkbox"]');
+            const toggleSettings = ['emailNotif', 'darkMode', 'twoFactor'];
+            toggleInputs.forEach((input, i) => {
+                const key = toggleSettings[i];
+                if (key && u.settings?.[key] !== undefined) {
+                    input.checked = !!u.settings[key];
+                }
+            });
+        }
+    } catch (err) {
+        console.error('Failed to load settings:', err);
+    }
 }
 
 // Sign Out
-// Simpler fallback: find the logout button by icon text
 document.querySelectorAll('.material-symbols-outlined').forEach(el => {
     if (el.textContent.trim() === 'logout') {
         el.closest('button').addEventListener('click', async function() {
             if (await window.showAppConfirm('Are you sure you want to sign out?')) {
-                localStorage.removeItem('ff_transactions');
-                localStorage.removeItem('ff_goals');
+                try { await window.API.logout(); } catch {}
+                localStorage.removeItem('ff_token');
+                localStorage.removeItem('ff_userName');
+                localStorage.removeItem('ff_userEmail');
                 window.location.href = 'index.html';
             }
         });
@@ -248,6 +279,7 @@ document.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('click', async function() {
             if (await window.showAppConfirm('⚠️ This action is permanent!\n\nAre you absolutely sure you want to delete your account? All financial data will be lost.')) {
                 if (await window.showAppConfirm('Final confirmation: Click Confirm to proceed with account deletion.')) {
+                    try { await window.API.logout(); } catch {}
                     localStorage.clear();
                     await window.showAppAlert('Account deleted successfully.');
                     window.location.href = 'index.html';
@@ -260,35 +292,38 @@ document.querySelectorAll('button').forEach(btn => {
 // Edit Profile
 document.querySelectorAll('button').forEach(btn => {
     if (btn.textContent.trim() === 'Edit Profile') {
-        // Init name
-        const nameEl = document.getElementById('settingsUserName');
-        const emailEl = document.getElementById('settingsUserEmail');
-        if (nameEl) nameEl.textContent = (localStorage.getItem('ff_userName') || '').trim() || 'User';
-        if (emailEl) emailEl.textContent = (localStorage.getItem('ff_userEmail') || '').trim() || '—';
-        
         btn.addEventListener('click', async function() {
+            const nameEl = document.getElementById('settingsUserName');
+            const emailEl = document.getElementById('settingsUserEmail');
             const currentName = nameEl?.textContent || 'User';
             const currentEmail = emailEl?.textContent === '—' ? '' : (emailEl?.textContent || '');
             const newName = await window.showAppPrompt('Enter your name:', currentName);
-            if (newName && newName.trim()) {
-                if(nameEl) nameEl.textContent = newName.trim();
-                localStorage.setItem('ff_userName', newName.trim());
-            }
+            if (!newName || !newName.trim()) return;
             const newEmail = await window.showAppPrompt('Enter your email:', currentEmail);
-            if (newEmail && newEmail.trim()) {
-                if(emailEl) emailEl.textContent = newEmail.trim();
-                localStorage.setItem('ff_userEmail', newEmail.trim());
+            if (!newEmail || !newEmail.trim()) return;
+            try {
+                const res = await window.API.updateSettings({ name: newName.trim(), email: newEmail.trim() });
+                if (res.success) {
+                    if (nameEl) nameEl.textContent = res.data.name;
+                    if (emailEl) emailEl.textContent = res.data.email;
+                    localStorage.setItem('ff_userName', res.data.name);
+                    localStorage.setItem('ff_userEmail', res.data.email);
+                    await window.showAppAlert('Profile updated successfully.');
+                } else {
+                    await window.showAppAlert(res.error || 'Failed to update profile.');
+                }
+            } catch (err) {
+                await window.showAppAlert('Failed to update profile.');
             }
-            await window.showAppAlert('Profile updated! Changes sync across all pages now.');
         });
     }
 });
 
-// Camera button
+// Camera button (photo upload not yet supported)
 document.querySelectorAll('.material-symbols-outlined').forEach(el => {
     if (el.textContent.trim() === 'photo_camera') {
         el.closest('button').addEventListener('click', async function() {
-            await window.showAppAlert('Photo upload is not available in this demo. Your profile picture would be updated here in a production environment.');
+            await window.showAppAlert('Photo upload is not yet supported. This feature is coming soon.');
         });
     }
 });
@@ -297,9 +332,9 @@ document.querySelectorAll('.material-symbols-outlined').forEach(el => {
 document.querySelector('form')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const inputs = this.querySelectorAll('input[type="password"]');
-    const current = inputs[0]?.value;
+    const currentPw = inputs[0]?.value;
     const newPw = inputs[1]?.value;
-    if (!current || !newPw) {
+    if (!currentPw || !newPw) {
         await window.showAppAlert('Please fill in both password fields.');
         return;
     }
@@ -307,25 +342,40 @@ document.querySelector('form')?.addEventListener('submit', async function(e) {
         await window.showAppAlert('New password must be at least 6 characters.');
         return;
     }
-    await window.showAppAlert('✅ Password updated successfully! (Demo: not persisted)');
-    inputs.forEach(i => i.value = '');
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+        const res = await window.API.changePassword(currentPw, newPw);
+        if (res.success) {
+            await window.showAppAlert('✅ Password updated successfully!');
+            inputs.forEach(i => i.value = '');
+        } else {
+            await window.showAppAlert(res.error || 'Failed to update password.');
+        }
+    } catch (err) {
+        await window.showAppAlert(err.message || 'Failed to update password.');
+    } finally {
+        btn.disabled = false;
+    }
 });
 
 // Persist toggle states
-const toggleKeys = ['ff_emailNotif', 'ff_darkMode', 'ff_twoFactor'];
+const toggleSettings = ['emailNotif', 'darkMode', 'twoFactor'];
 const toggleInputs = document.querySelectorAll('input[type="checkbox"]');
 toggleInputs.forEach((input, i) => {
-    const saved = localStorage.getItem(toggleKeys[i]);
+    const key = toggleSettings[i];
+    if (!key) return;
+    // Restore from localStorage
+    const saved = localStorage.getItem('ff_' + key);
     if (saved !== null) {
         input.checked = saved === 'true';
-    } else if (toggleKeys[i] === 'ff_darkMode') {
-        input.checked = true; // default
+    } else if (key === 'darkMode') {
+        input.checked = true;
     }
 
-    input.addEventListener('change', () => {
-        localStorage.setItem(toggleKeys[i], input.checked);
-        
-        if (toggleKeys[i] === 'ff_darkMode') {
+    input.addEventListener('change', async () => {
+        localStorage.setItem('ff_' + key, input.checked);
+        if (key === 'darkMode') {
             if (input.checked) {
                 document.documentElement.classList.remove('light');
                 document.documentElement.classList.add('dark');
@@ -334,14 +384,14 @@ toggleInputs.forEach((input, i) => {
                 document.documentElement.classList.add('light');
             }
         }
+        // Persist to server
+        try {
+            await window.API.updateSettings({ settings: { [key]: input.checked } });
+        } catch {}
     });
 });
 
-// Load saved name
-const savedName = localStorage.getItem('ff_userName');
-if (savedName) {
-    const nameEl = document.querySelector('h2.text-2xl');
-    if (nameEl) nameEl.textContent = savedName;
-}
+// Initial load
+loadSettings();
 </script>
 </body></html>
