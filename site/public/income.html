@@ -179,7 +179,7 @@
             <input id="incDesc" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="e.g. Monthly Salary" required/>
         </div>
         <div>
-            <label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Amount (₹)</label>
+            <label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Amount (<span id="incAmountCurrencyLabel">₹</span>)</label>
             <input id="incAmount" type="number" step="0.01" min="0.01" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="0.00" required/>
         </div>
         <button type="submit" class="w-full bg-primary text-background-dark font-bold text-base py-3 px-6 rounded-xl neon-glow hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
@@ -259,8 +259,4 @@
 <script src="api.js"></script>
 <script src="shared_modals.js"></script>
 <script src="income.js"></script>
-</body></html>
-
-const ICONS = { Salary:'payments', Freelance:'work', Investment:'show_chart', Food:'restaurant', Housing:'home', Transport:'flight', Entertainment:'movie', Technology:'shopping_bag', Other:'more_horiz' };
-
 </body></html>

@@ -178,10 +178,10 @@ document.getElementById('currencySelector')?.addEventListener('change', async fu
     try {
         await API.put('/settings', { currency });
         localStorage.setItem('ff_currency', currency);
-        window.showAppAlert('Currency updated! Changes will apply to new transactions.');
+        window.showAppAlert('Currency updated! Amounts will be displayed in the selected currency (FX rates required).');
     } catch (e) {
         console.error('Failed to update currency on server', e);
         localStorage.setItem('ff_currency', currency);
-        window.showAppAlert('Currency saved locally. Server sync will occur when available.');
+        window.showAppAlert('Currency saved locally. Amounts will be displayed in the selected currency (FX rates required).');
     }
 });

@@ -11,6 +11,7 @@ async function loadUser() {
     }
 }
 loadUser();
+document.getElementById('expAmountCurrencyLabel')?.replaceChildren(document.createTextNode(API.getCurrencySymbol()));
 
 const catIcons = { Housing: 'home', Food: 'shopping_cart', Transport: 'directions_car', Entertainment: 'movie', Technology: 'devices', Other: 'more_horiz' };
 const catColors = { Housing: 'orange', Food: 'emerald', Transport: 'blue', Entertainment: 'purple', Technology: 'indigo', Other: 'slate' };
@@ -24,7 +25,9 @@ async function loadExpensesData() {
     try {
         const data = await API.get('/transactions');
         const transactions = data.transactions || [];
-        allExpenses = transactions.filter(t => t.type === 'expense').sort((a, b) => new Date(b.occurredAt || b.date) - new Date(a.occurredAt || a.date));
+        const expenses = transactions.filter(t => t.type === 'expense');
+        const hydrated = await API.hydrateTransactionsForDisplay(expenses);
+        allExpenses = hydrated.sort((a, b) => API.parseTxnDate(b.occurredAt || b.date) - API.parseTxnDate(a.occurredAt || a.date));
         renderExpenses();
     } catch (error) {
         if (error.message.includes('token')) window.location.href = 'index.html';
@@ -39,15 +42,19 @@ function renderExpenses() {
     const prevMonth = getMonthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1));
     
     // Stats
-    const total = expenses.reduce((sum, t) => sum + t.amount, 0);
+    const total = expenses.reduce((sum, t) => sum + (t.displayAmount ?? t.amount), 0);
     const symbol = API.getCurrencySymbol();
-    document.getElementById('statTotalExp').innerHTML = `${symbol}${Math.floor(total).toLocaleString()}<span class="text-xl text-primary/50">.${(total%1).toFixed(2).substring(2).padEnd(2, '0')}</span>`;
+    document.getElementById('statTotalExp').textContent = API.formatMoney(total);
     document.getElementById('statExpCount').textContent = expenses.length;
-    document.getElementById('statExpAvg').textContent = `Avg. ${symbol}${(total / (expenses.length || 1)).toFixed(2)} per transaction`;
+    document.getElementById('statExpAvg').textContent = `Avg. ${API.formatMoney(total / (expenses.length || 1))} per transaction`;
     
     // Month-over-month trend
-    const curMonthTotal = expenses.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === curMonth).reduce((s, t) => s + t.amount, 0);
-    const prevMonthTotal = expenses.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === prevMonth).reduce((s, t) => s + t.amount, 0);
+    const curMonthTotal = expenses
+        .filter(t => getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === curMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
+    const prevMonthTotal = expenses
+        .filter(t => getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === prevMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
     const trendEl = document.getElementById('statExpTrend');
     if (prevMonthTotal > 0) {
         const pctChange = ((curMonthTotal - prevMonthTotal) / prevMonthTotal) * 100;
@@ -64,14 +71,17 @@ function renderExpenses() {
     
     // Biggest Category
     const catMap = {};
-    expenses.forEach(t => { catMap[t.category] = (catMap[t.category] || 0) + (t.amount || 0); });
+    expenses.forEach(t => {
+        const amt = Number(t.displayAmount ?? t.amount ?? 0) || 0;
+        catMap[t.category] = (catMap[t.category] || 0) + amt;
+    });
     let biggestCat = 'None', biggestAmt = 0;
     for(const [c, a] of Object.entries(catMap)) {
         if(a > biggestAmt) { biggestAmt = a; biggestCat = c; }
     }
     const biggestPct = total > 0 ? Math.round((biggestAmt / total) * 100) : 0;
     document.getElementById('statBiggestCatName').textContent = biggestCat;
-    document.getElementById('statBiggestCatAmount').textContent = `${symbol}${biggestAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    document.getElementById('statBiggestCatAmount').textContent = API.formatMoney(biggestAmt);
     document.getElementById('statBiggestCatPct').textContent = `| ${biggestPct}% of total`;
 
     // Distribution donut chart
@@ -86,10 +96,11 @@ function renderExpenses() {
         tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-slate-500">No expenses yet. Click <span class="text-primary font-bold">Add Expense</span> to start tracking.</td></tr>`;
     } else {
         tbody.innerHTML = expenses.map(t => {
-            const d = new Date(t.occurredAt || t.date);
+            const d = API.parseTxnDate(t.occurredAt || t.date);
             const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
             const icon = catIcons[t.category] || 'receipt';
             const color = catColors[t.category] || 'slate';
+            const amount = t.displayAmount ?? t.amount;
             return `<tr class="hover:bg-white/5 transition-all group cursor-pointer" data-category="${t.category}">
                 <td class="px-6 py-6 text-slate-400 text-sm font-medium italic">${dateStr}</td>
                 <td class="px-6 py-6"><div class="flex items-center gap-3">
@@ -98,7 +109,7 @@ function renderExpenses() {
                     </div><span class="font-bold text-white">${t.category}</span></div></td>
                 <td class="px-6 py-6 text-slate-300 font-medium">${t.desc || t.description}</td>
                 <td class="px-6 py-6 text-right flex items-center justify-end gap-4 h-full">
-                    <span class="text-white font-black text-lg group-hover:text-primary transition-colors">${symbol}${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                    <span class="text-white font-black text-lg group-hover:text-primary transition-colors">${API.formatMoney(amount)}</span>
                     <button class="delete-exp opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all" data-id="${t.id}">
                         <span class="material-symbols-outlined text-lg">delete</span>
                     </button>
@@ -231,7 +242,7 @@ document.getElementById('expenseForm').addEventListener('submit', async function
             category: cat,
             description: desc,
             amount: amount,
-            currency: 'INR',
+            currency: API.getCurrency(),
             occurredAt: occurredAt
         });
         this.reset();

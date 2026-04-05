@@ -2,21 +2,9 @@ import * as mysqlQueries from './db/queries.mjs';
 import { getPool } from './db/connection.mjs';
 
 // In-memory fallback storage
-let memoryTransactions = [
-  { id: 1, type: 'expense', description: 'Apple Store', category: 'Technology', amount: 1299, currency: 'INR', occurredAt: '2023-10-24T14:45:00.000Z' },
-  { id: 2, type: 'income', description: 'Monthly Salary', category: 'Salary', amount: 12450, currency: 'INR', occurredAt: '2023-10-01T09:00:00.000Z' },
-  { id: 3, type: 'expense', description: 'Lumière Dining', category: 'Food', amount: 240, currency: 'INR', occurredAt: '2023-09-30T20:15:00.000Z' },
-  { id: 4, type: 'expense', description: 'Electric Utility', category: 'Housing', amount: 112, currency: 'INR', occurredAt: '2023-09-21T10:30:00.000Z' },
-  { id: 5, type: 'expense', description: 'Skyline Airways', category: 'Transport', amount: 850, currency: 'INR', occurredAt: '2023-09-28T11:30:00.000Z' },
-  { id: 6, type: 'expense', description: 'Grocery Shopping', category: 'Food', amount: 450, currency: 'INR', occurredAt: '2023-10-15T10:30:00.000Z' },
-  { id: 7, type: 'expense', description: 'Gas Station', category: 'Transport', amount: 120, currency: 'INR', occurredAt: '2023-10-18T08:15:00.000Z' },
-  { id: 8, type: 'income', description: 'Freelance Project', category: 'Income', amount: 5000, currency: 'INR', occurredAt: '2023-10-10T14:00:00.000Z' },
-];
+let memoryTransactions = [];
 
-let memoryGoals = [
-  { id: 1, name: 'New Porsche 911', targetAmount: 160000, savedAmount: 104000, currency: 'INR' },
-  { id: 2, name: 'Tokyo Trip', targetAmount: 12000, savedAmount: 11040, currency: 'INR' }
-];
+let memoryGoals = [];
 
 let memoryUser = {
   id: '1',
@@ -36,8 +24,25 @@ async function isMySQL() {
   return pool !== null;
 }
 
+let defaultUserEnsured = false;
+async function ensureDefaultUser(userId = '1') {
+  if (defaultUserEnsured) return;
+  if (!(await isMySQL())) return;
+
+  await mysqlQueries.ensureUserById(userId, 'Demo User', 'demo@financeflow.local');
+  await mysqlQueries.ensureUserSettings(userId, {
+    currency: 'INR',
+    monthlyGoal: 10000,
+    emailNotif: false,
+    darkMode: true,
+    twoFactor: false
+  });
+  defaultUserEnsured = true;
+}
+
 export async function getUser(userId = '1') {
   if (await isMySQL()) {
+    await ensureDefaultUser(userId);
     const user = await mysqlQueries.getUserById(userId);
     if (user) {
       const settings = await mysqlQueries.getUserSettings(userId);
@@ -59,6 +64,7 @@ export async function getUser(userId = '1') {
 
 export async function getUserByEmail(email) {
   if (await isMySQL()) {
+    await ensureDefaultUser('1');
     return await mysqlQueries.getUserByEmail(email);
   }
   return memoryUser.email === email ? memoryUser : null;
@@ -66,6 +72,7 @@ export async function getUserByEmail(email) {
 
 export async function getTransactions(userId = '1', filters = {}) {
   if (await isMySQL()) {
+    await ensureDefaultUser(userId);
     const rows = await mysqlQueries.getTransactions(userId, filters);
     return rows.map(row => ({
       id: row.id,
@@ -98,7 +105,18 @@ export async function getTransactions(userId = '1', filters = {}) {
 
 export async function getTransactionById(id) {
   if (await isMySQL()) {
-    return await mysqlQueries.getTransactionById(id);
+    await ensureDefaultUser('1');
+    const row = await mysqlQueries.getTransactionById(id);
+    if (!row) return null;
+    return {
+      id: row.id,
+      type: row.type,
+      description: row.description,
+      category: row.category,
+      amount: parseFloat(row.amount),
+      currency: row.currency,
+      occurredAt: row.occurred_at
+    };
   }
   return memoryTransactions.find(t => t.id === parseInt(id));
 }
@@ -107,15 +125,27 @@ export async function createTransaction(userId = '1', data) {
   console.log('dataAccess.createTransaction called with:', { userId, data });
   
   if (await isMySQL()) {
+    await ensureDefaultUser(userId);
     console.log('Using MySQL to create transaction');
     const id = await mysqlQueries.createTransaction(userId, data);
     console.log('MySQL transaction created with ID:', id);
-    return id ? await mysqlQueries.getTransactionById(id) : null;
+    const row = id ? await mysqlQueries.getTransactionById(id) : null;
+    if (!row) return null;
+    return {
+      id: row.id,
+      type: row.type,
+      description: row.description,
+      category: row.category,
+      amount: parseFloat(row.amount),
+      currency: row.currency,
+      occurredAt: row.occurred_at
+    };
   }
 
   console.log('Using in-memory storage to create transaction');
+  const nextId = memoryTransactions.length > 0 ? Math.max(...memoryTransactions.map(t => t.id)) + 1 : 1;
   const newTx = {
-    id: Math.max(...memoryTransactions.map(t => t.id)) + 1,
+    id: nextId,
     ...data,
     amount: parseFloat(data.amount)
   };
@@ -126,6 +156,7 @@ export async function createTransaction(userId = '1', data) {
 
 export async function deleteTransaction(id) {
   if (await isMySQL()) {
+    await ensureDefaultUser('1');
     return await mysqlQueries.deleteTransaction(id);
   }
   
@@ -137,6 +168,7 @@ export async function deleteTransaction(id) {
 
 export async function getGoals(userId = '1') {
   if (await isMySQL()) {
+    await ensureDefaultUser(userId);
     const rows = await mysqlQueries.getGoals(userId);
     return rows.map(row => ({
       id: row.id,
@@ -151,11 +183,13 @@ export async function getGoals(userId = '1') {
 
 export async function createGoal(userId = '1', data) {
   if (await isMySQL()) {
+    await ensureDefaultUser(userId);
     return await mysqlQueries.createGoal(userId, data);
   }
   
+  const nextId = memoryGoals.length > 0 ? Math.max(...memoryGoals.map(g => g.id)) + 1 : 1;
   const newGoal = {
-    id: Math.max(...memoryGoals.map(g => g.id)) + 1,
+    id: nextId,
     ...data
   };
   memoryGoals.push(newGoal);
@@ -164,6 +198,7 @@ export async function createGoal(userId = '1', data) {
 
 export async function getUserSettings(userId = '1') {
   if (await isMySQL()) {
+    await ensureDefaultUser(userId);
     return await mysqlQueries.getUserSettings(userId);
   }
   return memoryUser.settings;
@@ -171,6 +206,7 @@ export async function getUserSettings(userId = '1') {
 
 export async function updateUserSettings(userId = '1', settings) {
   if (await isMySQL()) {
+    await ensureDefaultUser(userId);
     return await mysqlQueries.updateUserSettings(userId, settings);
   }
   

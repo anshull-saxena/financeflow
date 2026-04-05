@@ -13,6 +13,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const FX_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const fxCache = new Map(); // base -> { fetchedAt, rates }
 
 // Middleware
 app.use(cors({ origin: '*', credentials: true }));
@@ -38,7 +40,7 @@ app.get('/expenses', (req, res) => res.sendFile(path.join(__dirname, '../../site
 app.get('/income', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/income.html')));
 app.get('/settings', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/settings.html')));
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/index.html')));
-app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/onboarding.html')));
+app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/signup.html')));
 app.get('/analytics', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/reports_analytics/analytics-dynamic.html')));
 
 // Serve static files from site/public
@@ -47,6 +49,36 @@ app.use(express.static(path.join(__dirname, '../../site/public')));
 // API: Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'FinanceFlow API' });
+});
+
+// API: FX rates (no-key provider via backend proxy + caching)
+app.get('/api/fx/latest', async (req, res) => {
+  try {
+    const base = String(req.query.base || 'USD').toUpperCase();
+    if (!/^[A-Z]{3}$/.test(base)) {
+      return res.status(400).json({ success: false, error: 'Invalid base currency' });
+    }
+
+    const cached = fxCache.get(base);
+    if (cached && cached.fetchedAt && (Date.now() - cached.fetchedAt) < FX_CACHE_TTL_MS) {
+      return res.json({ success: true, data: { base, rates: cached.rates, fetchedAt: cached.fetchedAt } });
+    }
+
+    const response = await fetch(`https://open.er-api.com/v6/latest/${base}`);
+    if (!response.ok) {
+      return res.status(503).json({ success: false, error: 'FX_UNAVAILABLE' });
+    }
+    const json = await response.json();
+    if (json?.result !== 'success' || !json?.rates) {
+      return res.status(503).json({ success: false, error: 'FX_UNAVAILABLE' });
+    }
+
+    const entry = { fetchedAt: Date.now(), rates: json.rates };
+    fxCache.set(base, entry);
+    return res.json({ success: true, data: { base, rates: entry.rates, fetchedAt: entry.fetchedAt } });
+  } catch (error) {
+    return res.status(503).json({ success: false, error: 'FX_UNAVAILABLE' });
+  }
 });
 
 // API: Dashboard

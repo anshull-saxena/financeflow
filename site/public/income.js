@@ -14,7 +14,9 @@ let allIncomeTxns = [];
 async function loadIncomeData() {
     try {
         const data = await API.get('/transactions');
-        allIncomeTxns = (data.transactions || []).filter(t => t.type === 'income').sort((a, b) => new Date(b.occurredAt || b.date) - new Date(a.occurredAt || a.date));
+        const income = (data.transactions || []).filter(t => t.type === 'income');
+        const hydrated = await API.hydrateTransactionsForDisplay(income);
+        allIncomeTxns = hydrated.sort((a, b) => API.parseTxnDate(b.occurredAt || b.date) - API.parseTxnDate(a.occurredAt || a.date));
         renderIncome();
     } catch (e) {
         if (e.message.includes('token')) window.location.href = 'index.html';
@@ -29,18 +31,21 @@ function renderIncome() {
     const prevMonth = getMonthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1));
 
     // Update Stats
-    const total = incomeTxns.reduce((sum, t) => sum + t.amount, 0);
-    const symbol = API.getCurrencySymbol();
-    const curMonthIncome = incomeTxns.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === curMonth).reduce((s, t) => s + t.amount, 0);
-    const prevMonthIncome = incomeTxns.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === prevMonth).reduce((s, t) => s + t.amount, 0);
+    const total = incomeTxns.reduce((sum, t) => sum + (t.displayAmount ?? t.amount), 0);
+    const curMonthIncome = incomeTxns
+        .filter(t => getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === curMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
+    const prevMonthIncome = incomeTxns
+        .filter(t => getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === prevMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
     
-    document.getElementById('statTotalIncome').textContent = symbol + total.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('statTotalIncome').textContent = API.formatMoney(total);
 
     // Unique months with income
-    const monthSet = new Set(incomeTxns.map(t => getMonthKey(new Date(t.occurredAt || t.date))));
+    const monthSet = new Set(incomeTxns.map(t => getMonthKey(API.parseTxnDate(t.occurredAt || t.date))));
     const numMonths = monthSet.size || 1;
     const avgMonthly = total / numMonths;
-    document.getElementById('statAvgIncome').textContent = symbol + avgMonthly.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('statAvgIncome').textContent = API.formatMoney(avgMonthly);
     document.getElementById('statIncomeCount').textContent = incomeTxns.length.toString().padStart(2, '0');
 
     // Trend badges
@@ -67,10 +72,11 @@ function renderIncome() {
         tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-slate-500">No income records yet. Click <span class="text-primary font-bold">Add Income</span> to start tracking.</td></tr>`;
     } else {
         tbody.innerHTML = incomeTxns.map(t => {
-            const d = new Date(t.occurredAt || t.date);
+            const d = API.parseTxnDate(t.occurredAt || t.date);
             const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             const icon = ICONS[t.category] || 'payments';
             const c = CAT_COLORS[t.category] || 'blue';
+            const amount = t.displayAmount ?? t.amount;
             return `<tr class="hover:bg-primary/5 group transition-all duration-300">
                 <td class="px-6 py-6 text-slate-400 text-sm">${dateStr}</td>
                 <td class="px-6 py-6">
@@ -85,7 +91,7 @@ function renderIncome() {
                     </div>
                 </td>
                 <td class="px-6 py-6 text-slate-400 text-sm">${t.category}</td>
-                <td class="px-6 py-6 font-bold text-primary">${symbol}${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="px-6 py-6 font-bold text-primary">${API.formatMoney(amount)}</td>
                 <td class="px-6 py-6 flex items-center justify-end gap-3">
                     <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold">Cleared</span>
                     <button class="delete-inc opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all ml-2" data-id="${t.id}">
@@ -100,15 +106,18 @@ function renderIncome() {
 function renderBarChart(incomeTxns) {
     const container = document.getElementById('incomeBarChart');
     const now = new Date();
+    const symbol = API.getCurrencySymbol();
     const months = [];
     for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         months.push(getMonthKey(d));
     }
     
-    const monthTotals = months.map(mk => {
-        return incomeTxns.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === mk).reduce((s, t) => s + t.amount, 0);
-    });
+    const monthTotals = months.map(mk =>
+        incomeTxns
+            .filter(t => getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === mk)
+            .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0)
+    );
     
     const maxVal = Math.max(...monthTotals, 1);
     const curMonthKey = getMonthKey(now);
@@ -123,7 +132,7 @@ function renderBarChart(incomeTxns) {
         const glow = isCurrent ? 'neon-glow' : '';
         const labelColor = isCurrent ? 'text-primary' : 'text-slate-500';
         return `<div class="flex-1 flex flex-col items-center gap-3">
-            <div class="w-full bg-gradient-to-t ${gradient} rounded-t-lg ${glow} transition-all duration-500" style="height: ${height}px;" title="${symbol}${amt.toLocaleString()}"></div>
+            <div class="w-full bg-gradient-to-t ${gradient} rounded-t-lg ${glow} transition-all duration-500" style="height: ${height}px;" title="${symbol}${amt.toLocaleString(undefined, { maximumFractionDigits: 2 })}"></div>
             <span class="text-[10px] font-bold ${labelColor} uppercase">${getMonthLabel(mk)}</span>
         </div>`;
     }).join('');
@@ -194,7 +203,7 @@ document.getElementById('incomeForm').addEventListener('submit', async function(
             category: category,
             description: desc,
             amount: amount,
-            currency: 'INR',
+            currency: API.getCurrency(),
             occurredAt: occurredAt
         });
 
@@ -218,7 +227,7 @@ document.querySelectorAll('button').forEach(btn => {
             btn.classList.toggle('bg-primary/20', filterOn);
             btn.classList.toggle('text-primary', filterOn);
             if (filterOn) {
-                const threshold = await window.showAppPrompt('Show income above (₹):', '1000');
+                const threshold = await window.showAppPrompt(`Show income above (${API.getCurrencySymbol()}):`, '1000');
                 if (threshold === null) { filterOn = false; btn.classList.remove('bg-primary/20', 'text-primary'); return; }
                 const minAmt = parseFloat(threshold) || 0;
                 document.querySelectorAll('#incomeTbody tr').forEach(row => {
@@ -267,4 +276,5 @@ document.getElementById('upgradeProCard')?.addEventListener('click', async () =>
 });
 
 // Initial Render
+document.getElementById('incAmountCurrencyLabel')?.replaceChildren(document.createTextNode(API.getCurrencySymbol()));
 loadIncomeData();

@@ -19,11 +19,38 @@ export async function getUserByEmail(email) {
 }
 
 export async function createUser(name, email) {
-  const result = await query(
-    'INSERT INTO users (name, email) VALUES (?, ?)',
-    [name, email]
+  // Schema uses a CHAR(36) primary key, so callers should insert with an explicit id.
+  // This helper is kept for compatibility but will no-op without an id.
+  return null;
+}
+
+export async function ensureUserById(id, name, email) {
+  await query(
+    `INSERT INTO users (id, name, email)
+     VALUES (?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+       name = VALUES(name),
+       email = VALUES(email)`,
+    [id, name, email]
   );
-  return result?.insertId || null;
+  return true;
+}
+
+export async function ensureUserSettings(userId, settings) {
+  const currency = settings?.currency || 'INR';
+  const monthlyGoal = settings?.monthlyGoal ?? null;
+  const emailNotif = Boolean(settings?.emailNotif);
+  const darkMode = settings?.darkMode !== undefined ? Boolean(settings?.darkMode) : true;
+  const twoFactor = Boolean(settings?.twoFactor);
+
+  await query(
+    `INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor)
+     VALUES (?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+       user_id = user_id`,
+    [userId, currency, monthlyGoal, emailNotif, darkMode, twoFactor]
+  );
+  return true;
 }
 
 // ============ TRANSACTION QUERIES ============

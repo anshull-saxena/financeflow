@@ -118,46 +118,6 @@ ENVEOF
 echo -e "${GREEN}✅ .env file created${NC}"
 echo ""
 
-# Seed demo data (optional)
-echo "🌱 Do you want to seed demo data? (y/n)"
-read -p "> " SEED_DATA
-
-if [ "$SEED_DATA" = "y" ] || [ "$SEED_DATA" = "Y" ]; then
-    echo "Seeding demo data..."
-    
-    mysql -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" "$DB_NAME" << SEED_SCRIPT
--- Insert demo user
-INSERT INTO users (id, name, email) VALUES ('1', 'Demo User', 'demo@financeflow.local')
-ON DUPLICATE KEY UPDATE name='Demo User';
-
--- Insert demo transactions
-INSERT INTO transactions (user_id, type, description, category, amount, currency, occurred_at) VALUES
-('1', 'expense', 'Apple Store', 'Technology', 1299.00, 'INR', '2023-10-24 14:45:00'),
-('1', 'income', 'Monthly Salary', 'Salary', 12450.00, 'INR', '2023-10-01 09:00:00'),
-('1', 'expense', 'Lumière Dining', 'Food', 240.00, 'INR', '2023-09-30 20:15:00'),
-('1', 'expense', 'Electric Utility', 'Housing', 112.00, 'INR', '2023-09-21 10:30:00'),
-('1', 'expense', 'Skyline Airways', 'Transport', 850.00, 'INR', '2023-09-28 11:30:00'),
-('1', 'expense', 'Grocery Shopping', 'Food', 450.00, 'INR', '2023-10-15 10:30:00'),
-('1', 'expense', 'Gas Station', 'Transport', 120.00, 'INR', '2023-10-18 08:15:00'),
-('1', 'income', 'Freelance Project', 'Income', 5000.00, 'INR', '2023-10-10 14:00:00')
-ON DUPLICATE KEY UPDATE description=description;
-
--- Insert demo goals
-INSERT INTO goals (user_id, name, target_amount, saved_amount, currency) VALUES
-('1', 'New Porsche 911', 160000.00, 104000.00, 'INR'),
-('1', 'Tokyo Trip', 12000.00, 11040.00, 'INR')
-ON DUPLICATE KEY UPDATE name=name;
-
--- Insert user settings
-INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor) VALUES
-('1', 'INR', 10000.00, true, true, false)
-ON DUPLICATE KEY UPDATE currency='INR';
-SEED_SCRIPT
-
-    echo -e "${GREEN}✅ Demo data seeded${NC}"
-fi
-echo ""
-
 # Success message
 echo "═══════════════════════════════════════"
 echo -e "${GREEN}🎉 Setup Complete!${NC}"

@@ -9,8 +9,7 @@ const ICONS = { Salary:'payments', Freelance:'work', Investment:'show_chart', Fo
 
 // ── Helpers ─────────────────────────────────────────
 function fmt(n) { 
-    const symbol = API.getCurrencySymbol();
-    return symbol + n.toLocaleString('en-US', { minimumFractionDigits: 2 }); 
+    return API.formatMoney(n);
 }
 
 function calcPctChange(current, previous) {
@@ -45,13 +44,15 @@ function renderPortfolioChart() {
     const daysAgo = new Date(now);
     daysAgo.setDate(daysAgo.getDate() - chartPeriod);
 
-    const sorted = txns.slice().sort((a, b) => new Date(a.occurredAt || a.date) - new Date(b.occurredAt || b.date));
+    const sorted = txns.slice().sort((a, b) => API.parseTxnDate(a.occurredAt || a.date) - API.parseTxnDate(b.occurredAt || b.date));
     let balance = 0;
     const dailyMap = {};
 
     sorted.forEach(t => {
-        if (new Date(t.occurredAt || t.date) < daysAgo) {
-            balance += t.type === 'income' ? t.amount : -t.amount;
+        const d = API.parseTxnDate(t.occurredAt || t.date);
+        const amt = t.displayAmount ?? t.amount;
+        if (d < daysAgo) {
+            balance += t.type === 'income' ? amt : -amt;
         }
     });
 
@@ -67,10 +68,11 @@ function renderPortfolioChart() {
         const dayKey = d.toISOString().slice(0, 10);
         
         sorted.forEach(t => {
-            const td = new Date(t.occurredAt || t.date).toISOString().slice(0, 10);
+            const td = API.parseTxnDate(t.occurredAt || t.date).toISOString().slice(0, 10);
             if (td <= dayKey && !dailyMap[t.id]) {
-                if (new Date(t.occurredAt || t.date) >= daysAgo) {
-                    runBal += t.type === 'income' ? t.amount : -t.amount;
+                const amt = t.displayAmount ?? t.amount;
+                if (API.parseTxnDate(t.occurredAt || t.date) >= daysAgo) {
+                    runBal += t.type === 'income' ? amt : -amt;
                     dailyMap[t.id] = true;
                 }
             }
@@ -111,9 +113,10 @@ function renderPortfolioChart() {
     const yAxis = document.getElementById('chartYAxis');
     const steps = 4;
     yAxis.innerHTML = '';
+    const symbol = API.getCurrencySymbol();
     for (let i = 0; i < steps; i++) {
         const val = max - (i * range / (steps - 1));
-        const label = Math.abs(val) >= 1000 ? '₹' + (val / 1000).toFixed(0) + 'k' : '₹' + val.toFixed(0);
+        const label = Math.abs(val) >= 1000 ? `${symbol}${(val / 1000).toFixed(0)}k` : `${symbol}${val.toFixed(0)}`;
         yAxis.innerHTML += `<span>${label}</span>`;
     }
 
@@ -131,8 +134,8 @@ async function loadDashboard() {
         const txData = await API.get('/transactions'); // Need full history for graph mapping
         
         appData.user = dashData.user;
-        appData.goals = dashData.goals;
-        appData.txns = txData.transactions || [];
+        appData.goals = await API.hydrateGoalsForDisplay(dashData.goals || []);
+        appData.txns = await API.hydrateTransactionsForDisplay(txData.transactions || []);
         
         await renderUI(dashData.stats);
     } catch (e) {
@@ -151,10 +154,18 @@ async function renderUI(serverStats) {
     const curMonth = getMonthKey(now);
     const prevMonth = getMonthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1));
 
-    const curIncome = txns.filter(t => t.type === 'income' && getMonthKey(new Date(t.occurredAt || t.date)) === curMonth).reduce((s, t) => s + t.amount, 0);
-    const prevIncome = txns.filter(t => t.type === 'income' && getMonthKey(new Date(t.occurredAt || t.date)) === prevMonth).reduce((s, t) => s + t.amount, 0);
-    const curExpense = txns.filter(t => t.type === 'expense' && getMonthKey(new Date(t.occurredAt || t.date)) === curMonth).reduce((s, t) => s + t.amount, 0);
-    const prevExpense = txns.filter(t => t.type === 'expense' && getMonthKey(new Date(t.occurredAt || t.date)) === prevMonth).reduce((s, t) => s + t.amount, 0);
+    const curIncome = txns
+        .filter(t => t.type === 'income' && getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === curMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
+    const prevIncome = txns
+        .filter(t => t.type === 'income' && getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === prevMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
+    const curExpense = txns
+        .filter(t => t.type === 'expense' && getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === curMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
+    const prevExpense = txns
+        .filter(t => t.type === 'expense' && getMonthKey(API.parseTxnDate(t.occurredAt || t.date)) === prevMonth)
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
     
     // User Profile
     const rawName = appData.user?.name || (localStorage.getItem('ff_userName') || '').trim();
@@ -164,14 +175,19 @@ async function renderUI(serverStats) {
     const cardHolder = document.getElementById('cardHolderName');
     if (cardHolder) cardHolder.textContent = rawName && rawName !== 'Demo User' ? rawName.toUpperCase() : '—';
 
-    // Current balances (Using Server Stats explicitly when possible)
-    const balance = serverStats?.balance ?? (txns.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0) - txns.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0));
+    // Current balances (computed from displayed currency amounts)
+    const balance = txns
+        .filter(t => t.type === 'income')
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0) -
+        txns
+        .filter(t => t.type === 'expense')
+        .reduce((s, t) => s + (t.displayAmount ?? t.amount), 0);
     
     document.querySelector('[data-stat="balance"]').textContent = fmt(balance);
     document.querySelector('[data-stat="income"]').textContent = fmt(curIncome);
     document.querySelector('[data-stat="expenses"]').textContent = fmt(curExpense);
 
-    const prevBalance = (serverStats?.totalIncome - prevIncome) - (serverStats?.totalExpenses - prevExpense);
+    const prevBalance = balance - (curIncome - curExpense);
     
     document.getElementById('balanceBadge').textContent = calcPctChange(balance, prevBalance || 0).text;
     document.getElementById('incomeBadge').textContent = calcPctChange(curIncome, prevIncome).text;
@@ -183,11 +199,12 @@ async function renderUI(serverStats) {
         return { date: d.toISOString().slice(0, 10), income: 0, expense: 0 };
     });
     txns.forEach(t => {
-        const dk = new Date(t.occurredAt || t.date).toISOString().slice(0, 10);
+        const dk = API.parseTxnDate(t.occurredAt || t.date).toISOString().slice(0, 10);
         const day = last7.find(d => d.date === dk);
         if (day) {
-            if (t.type === 'income') day.income += Math.abs(t.amount);
-            else day.expense += Math.abs(t.amount);
+            const amt = Math.abs(t.displayAmount ?? t.amount);
+            if (t.type === 'income') day.income += amt;
+            else day.expense += amt;
         }
     });
 
@@ -199,7 +216,7 @@ async function renderUI(serverStats) {
     renderPortfolioChart();
 
     const tbody = document.getElementById('txnBody');
-    const recentTxns = serverStats?.recentTransactions || txns.slice().sort((a, b) => new Date(b.occurredAt || b.date) - new Date(a.occurredAt || a.date)).slice(0, 8);
+    const recentTxns = txns.slice().sort((a, b) => API.parseTxnDate(b.occurredAt || b.date) - API.parseTxnDate(a.occurredAt || a.date)).slice(0, 8);
     
     if (recentTxns.length === 0) {
         tbody.innerHTML = `<div class="glass p-6 rounded-2xl border border-white/10 text-center">
@@ -208,10 +225,11 @@ async function renderUI(serverStats) {
         </div>`;
     } else {
         tbody.innerHTML = recentTxns.map(t => {
-            const d = new Date(t.occurredAt || t.date);
+            const d = API.parseTxnDate(t.occurredAt || t.date);
             const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
             const icon = ICONS[t.category] || 'receipt';
             const isIncome = t.type === 'income';
+            const amt = Math.abs(t.displayAmount ?? t.amount);
             return `<div class="glass flex items-center justify-between p-5 rounded-2xl border border-white/5 hover:border-primary/20 hover:bg-white/10 transition-all cursor-pointer group">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-xl ${isIncome ? 'bg-primary/10 text-primary' : 'bg-slate-800 text-white'} flex items-center justify-center">
@@ -224,7 +242,7 @@ async function renderUI(serverStats) {
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
-                        <p class="${isIncome ? 'text-primary' : 'text-white'} font-bold">${isIncome ? '+' : '-'}${API.getCurrencySymbol()}${Math.abs(t.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                        <p class="${isIncome ? 'text-primary' : 'text-white'} font-bold">${isIncome ? '+' : '-'}${API.formatMoney(amt)}</p>
                         <p class="text-slate-500 text-xs uppercase font-bold mt-1">${dateStr}</p>
                     </div>
                     <button class="delete-txn opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all" data-id="${t.id}">
@@ -245,7 +263,9 @@ async function renderUI(serverStats) {
     }
     
     gc.innerHTML = goals.map((g, index) => {
-        const pct = g.progress || Math.min(100, Math.round(((g.saved || g.savedAmount) / (g.target || g.targetAmount)) * 100));
+        const saved = g.displaySavedAmount ?? g.saved ?? g.savedAmount ?? 0;
+        const target = g.displayTargetAmount ?? g.target ?? g.targetAmount ?? 0;
+        const pct = g.progress || Math.min(100, Math.round(((saved) / (target || 1)) * 100));
         const colorClass = index % 2 === 1 ? 'accent-purple' : 'primary';
         const barShadow = index % 2 === 1 ? 'shadow-[0_0_10px_#a855f7]' : 'neon-glow';
         return `<div class="p-5 rounded-2xl bg-white/5 border border-white/10 group hover:border-${colorClass}/30 transition-all cursor-pointer" data-goal-id="${g.id}">
@@ -260,8 +280,8 @@ async function renderUI(serverStats) {
                 <div class="bg-${colorClass} h-full ${barShadow} transition-all duration-700" style="width: ${pct}%"></div>
             </div>
             <div class="flex justify-between mt-3">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Saved: ${API.getCurrencySymbol()}${(g.saved || g.savedAmount).toLocaleString()}</p>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target: ${API.getCurrencySymbol()}${(g.target || g.targetAmount).toLocaleString()}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Saved: ${API.formatMoney(saved)}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target: ${API.formatMoney(target)}</p>
             </div>
         </div>`;
     }).join('');
@@ -313,7 +333,7 @@ document.getElementById('txnForm').addEventListener('submit', async e => {
         description: document.getElementById('txnDesc').value,
         category: document.getElementById('txnCategory').value,
         amount: parseFloat(document.getElementById('txnAmount').value),
-        currency: 'INR',
+        currency: API.getCurrency(),
         occurredAt: occurredAt
     };
     
@@ -341,8 +361,8 @@ function openGoalModal(goal = null) {
         document.getElementById('goalSubmitBtn').textContent = 'Save Changes';
         document.getElementById('goalEditId').value = goal.id;
         document.getElementById('goalName').value = goal.name;
-        document.getElementById('goalTarget').value = goal.target || goal.targetAmount;
-        document.getElementById('goalSaved').value = goal.saved || goal.savedAmount;
+        document.getElementById('goalTarget').value = goal.displayTargetAmount ?? goal.target ?? goal.targetAmount;
+        document.getElementById('goalSaved').value = goal.displaySavedAmount ?? goal.saved ?? goal.savedAmount;
     } else {
         document.getElementById('goalModalTitle').textContent = 'New Financial Goal';
         document.getElementById('goalSubmitBtn').textContent = 'Create Goal';
