@@ -15,6 +15,24 @@ const API = {
         localStorage.setItem('ff_token', token);
     },
 
+    // Get Current Currency
+    getCurrency() {
+        return localStorage.getItem('ff_currency') || 'INR';
+    },
+
+    // Get Currency Symbol
+    getCurrencySymbol() {
+        const currency = this.getCurrency();
+        const symbols = {
+            'INR': '₹',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'JPY': '¥'
+        };
+        return symbols[currency] || '₹';
+    },
+
     // Generic Fetch Wrapper
     async request(endpoint, method = 'GET', body = null) {
         const headers = {
@@ -38,11 +56,11 @@ const API = {
         try {
             const response = await fetch(`${API_BASE}${endpoint}`, options);
             const data = await response.json();
-            
+
             if (!response.ok || !data.success) {
                 throw new Error(data.error || 'API Request Failed');
             }
-            
+
             return data.data || data; // Return payload or whole object if no nested data
         } catch (error) {
             console.error(`API Error on ${method} ${endpoint}:`, error);

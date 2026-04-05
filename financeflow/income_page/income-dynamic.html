@@ -2,50 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Income - FinancePro</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Income - FinanceFlow</title>
     <script src="/static/shared/darkmode.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: "class" }</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols_Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
+        .modal-backdrop { display: none; }
+        .modal-backdrop.active { display: flex; }
     </style>
 </head>
-<body class="bg-gray-50 flex min-h-screen">
+<body class="bg-gray-50 dark:bg-slate-900 dark:text-slate-100 flex min-h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-gray-200 fixed h-full">
+    <aside class="w-64 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 fixed h-full overflow-y-auto">
         <div class="p-6">
             <div class="flex items-center gap-3 mb-8">
-                <div class="bg-blue-600 rounded-lg p-2 text-white">
+                <div class="bg-emerald-600 rounded-lg p-2 text-white">
                     <span class="material-symbols-outlined">account_balance_wallet</span>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold">FinancePro</h1>
-                    <p class="text-xs text-gray-500">Personal Manager</p>
+                    <h1 class="text-lg font-bold dark:text-white">FinanceFlow</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Personal Manager</p>
                 </div>
             </div>
             <nav class="space-y-2">
-                <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span class="text-sm">Dashboard</span>
                 </a>
-                <a href="/income" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-semibold">
+                <a href="/income" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-semibold">
                     <span class="material-symbols-outlined">trending_up</span>
                     <span class="text-sm">Income</span>
                 </a>
-                <a href="/expenses" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <a href="/expenses" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined">trending_down</span>
                     <span class="text-sm">Expenses</span>
                 </a>
-                <a href="/analytics" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <a href="/analytics" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined">pie_chart</span>
                     <span class="text-sm">Analytics</span>
                 </a>
-                <div class="pt-4 mt-4 border-t border-gray-200">
-                    <a href="/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <div class="pt-4 mt-4 border-t border-gray-200 dark:border-slate-600">
+                    <a href="/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                         <span class="material-symbols-outlined">settings</span>
                         <span class="text-sm">Settings</span>
                     </a>
@@ -57,41 +59,41 @@
     <!-- Main Content -->
     <div class="ml-64 flex-1 p-8">
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Income</h1>
-            <p class="text-gray-600 mt-2">Track and manage your income sources</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Income</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Track and manage your income sources</p>
         </div>
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-xl p-6 shadow-sm">
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-gray-600 text-sm">Total Income</span>
+                    <span class="text-gray-600 dark:text-gray-400 text-sm">Total Income</span>
                     <span class="material-symbols-outlined text-green-500">trending_up</span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900" id="total-income">₹0</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white" id="total-income">₹0</p>
             </div>
-            <div class="bg-white rounded-xl p-6 shadow-sm">
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-gray-600 text-sm">This Month</span>
+                    <span class="text-gray-600 dark:text-gray-400 text-sm">This Month</span>
                     <span class="material-symbols-outlined text-blue-500">calendar_month</span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900" id="month-income">₹0</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white" id="month-income">₹0</p>
             </div>
-            <div class="bg-white rounded-xl p-6 shadow-sm">
+            <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-gray-600 text-sm">Transactions</span>
+                    <span class="text-gray-600 dark:text-gray-400 text-sm">Transactions</span>
                     <span class="material-symbols-outlined text-purple-500">receipt_long</span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900" id="total-count">0</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white" id="total-count">0</p>
             </div>
         </div>
 
         <!-- Filters and Add Button -->
-        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm mb-6">
             <div class="flex flex-wrap gap-4 items-center">
-                <input type="search" id="search" placeholder="Search income..." 
-                    class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg">
-                <select id="category-filter" class="px-4 py-2 border border-gray-300 rounded-lg">
+                <input type="search" id="search" placeholder="Search income..."
+                    class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
+                <select id="category-filter" class="px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg">
                     <option value="">All Categories</option>
                     <option value="Salary">Salary</option>
                     <option value="Freelance">Freelance</option>
@@ -101,40 +103,104 @@
                     <option value="Bonus">Bonus</option>
                     <option value="Other">Other</option>
                 </select>
-                <button onclick="addIncome()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                <button onclick="openIncomeModal()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
                     + Add Income
                 </button>
             </div>
         </div>
 
         <!-- Income Table -->
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
             <table class="w-full">
-                <thead class="bg-gray-50">
+                <thead class="bg-gray-50 dark:bg-slate-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Date</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Description</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Category</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">Amount</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">Date</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">Description</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">Category</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">Amount</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="income-table" class="divide-y divide-gray-200">
+                <tbody id="income-table" class="divide-y divide-gray-200 dark:divide-slate-600">
                     <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">Loading income...</td>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Loading income...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="mt-6 flex justify-between items-center">
-            <button onclick="loadPrevious()" id="prev-btn" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50" disabled>
+            <button onclick="loadPrevious()" id="prev-btn" class="px-4 py-2 border border-gray-300 dark:border-slate-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700" disabled>
                 Previous
             </button>
-            <span class="text-gray-600" id="page-info">Page 1</span>
-            <button onclick="loadNext()" id="next-btn" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <span class="text-gray-600 dark:text-gray-400" id="page-info">Page 1</span>
+            <button onclick="loadNext()" id="next-btn" class="px-4 py-2 border border-gray-300 dark:border-slate-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
                 Next
             </button>
+        </div>
+    </div>
+
+    <!-- Add Income Modal -->
+    <div id="income-modal" class="modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-slate-700">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+                <div class="flex items-center gap-3">
+                    <div class="size-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400">
+                        <span class="material-symbols-outlined">trending_up</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Add Income</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Record a new income entry</p>
+                    </div>
+                </div>
+                <button onclick="closeIncomeModal()" class="size-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Amount</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">₹</span>
+                            <input id="inc-amount" type="number" step="0.01" placeholder="0.00" class="w-full pl-8 pr-4 py-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-gray-900 dark:text-white font-medium">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Date</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 material-symbols-outlined text-lg">calendar_today</span>
+                            <input id="inc-date" type="date" class="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-gray-900 dark:text-white">
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Category</label>
+                    <select id="inc-category" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all appearance-none text-gray-900 dark:text-white">
+                        <option value="">Select a category</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Investment">Investment</option>
+                        <option value="Business">Business</option>
+                        <option value="Rental">Rental</option>
+                        <option value="Bonus">Bonus</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Description</label>
+                    <textarea id="inc-description" rows="3" placeholder="What was this income for?" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition-all text-gray-900 dark:text-white resize-none"></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-6 bg-gray-50 dark:bg-slate-700/50 flex flex-col-reverse sm:flex-row gap-3 border-t border-gray-200 dark:border-slate-700">
+                <button onclick="closeIncomeModal()" class="flex-1 px-6 py-3 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-600 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                    Cancel
+                </button>
+                <button onclick="saveIncome()" class="flex-[2] px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 shadow-lg shadow-green-600/20 transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-lg">check_circle</span>
+                    Save Income
+                </button>
+            </div>
         </div>
     </div>
 
@@ -151,13 +217,10 @@
             const result = await FinanceFlow.fetchTransactions({ type: 'income' });
             allIncome = result.data.transactions;
             filteredIncome = allIncome;
-            
             updateStats();
             renderPage();
         } catch (error) {
             console.error('Error loading income:', error);
-            document.getElementById('income-table').innerHTML = 
-                '<tr><td colspan="5" class="px-6 py-8 text-center text-red-500">Error loading income</td></tr>';
         }
     }
 
@@ -172,24 +235,24 @@
         const start = currentPage * pageSize;
         const end = start + pageSize;
         const pageIncome = filteredIncome.slice(start, end);
-        
         const tbody = document.getElementById('income-table');
+
         if (pageIncome.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No income found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">No income found</td></tr>';
             return;
         }
-        
+
         tbody.innerHTML = pageIncome.map(tx => `
-            <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 text-sm text-gray-900">${FinanceFlow.formatDate(tx.occurredAt)}</td>
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700">
+                <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">${FinanceFlow.formatDate(tx.occurredAt)}</td>
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-gray-400">${FinanceFlow.getTransactionIcon(tx.category)}</span>
-                        <span class="text-sm font-medium text-gray-900">${tx.description}</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-100">${tx.description}</span>
                     </div>
                 </td>
                 <td class="px-6 py-4">
-                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${tx.category}</span>
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">${tx.category}</span>
                 </td>
                 <td class="px-6 py-4 text-right text-sm font-semibold text-green-600">+${FinanceFlow.formatCurrency(tx.amount)}</td>
                 <td class="px-6 py-4 text-right">
@@ -199,82 +262,77 @@
                 </td>
             </tr>
         `).join('');
-        
+
         const totalPages = Math.ceil(filteredIncome.length / pageSize) || 1;
         document.getElementById('page-info').textContent = `Page ${currentPage + 1} of ${totalPages}`;
         document.getElementById('prev-btn').disabled = currentPage === 0;
         document.getElementById('next-btn').disabled = end >= filteredIncome.length;
     }
 
-    function loadNext() {
-        if ((currentPage + 1) * pageSize < filteredIncome.length) {
-            currentPage++;
-            renderPage();
-        }
-    }
-
-    function loadPrevious() {
-        if (currentPage > 0) {
-            currentPage--;
-            renderPage();
-        }
-    }
+    function loadNext() { if ((currentPage + 1) * pageSize < filteredIncome.length) { currentPage++; renderPage(); } }
+    function loadPrevious() { if (currentPage > 0) { currentPage--; renderPage(); } }
 
     async function deleteIncome(id) {
-        if (!confirm('Are you sure you want to delete this income?')) return;
-        
+        if (!confirm('Are you sure?')) return;
         try {
             await FinanceFlow.deleteTransaction(id);
             await loadIncome();
-            alert('Income deleted successfully!');
+            if (window.showToast) showToast('Income deleted!', 'success');
         } catch (error) {
-            alert('Failed to delete income: ' + error.message);
+            if (window.showToast) showToast('Failed to delete: ' + error.message, 'error');
         }
     }
 
-    function addIncome() {
-        const description = prompt('Description:');
-        if (!description) return;
-        
-        const amount = parseFloat(prompt('Amount:'));
-        if (!amount || amount <= 0) return alert('Invalid amount');
-        
-        const category = prompt('Category (Salary/Freelance/Investment/Business/Rental/Bonus/Other):');
-        if (!category) return;
-        
-        FinanceFlow.createTransaction({
-            type: 'income',
-            description,
-            category,
-            amount,
-            occurredAt: new Date().toISOString()
-        }).then(() => {
-            alert('Income added successfully!');
-            loadIncome();
-        }).catch(err => alert('Error: ' + err.message));
+    // Modal functions
+    function openIncomeModal() {
+        document.getElementById('income-modal').classList.add('active');
+        document.getElementById('inc-date').value = new Date().toISOString().split('T')[0];
     }
 
-    // Category filter
+    function closeIncomeModal() {
+        document.getElementById('income-modal').classList.remove('active');
+        document.getElementById('inc-amount').value = '';
+        document.getElementById('inc-description').value = '';
+        document.getElementById('inc-category').value = '';
+    }
+
+    async function saveIncome() {
+        const amount = parseFloat(document.getElementById('inc-amount').value);
+        const category = document.getElementById('inc-category').value;
+        const description = document.getElementById('inc-description').value;
+        const occurredAt = document.getElementById('inc-date').value;
+
+        if (!amount || amount <= 0) { if (window.showToast) showToast('Enter a valid amount', 'error'); return; }
+        if (!category) { if (window.showToast) showToast('Select a category', 'error'); return; }
+        if (!description) { if (window.showToast) showToast('Enter a description', 'error'); return; }
+
+        try {
+            await FinanceFlow.createTransaction({
+                type: 'income', description, category, amount,
+                currency: 'INR',
+                occurredAt: occurredAt ? new Date(occurredAt).toISOString() : new Date().toISOString()
+            });
+            closeIncomeModal();
+            if (window.showToast) showToast('Income added!', 'success');
+            await loadIncome();
+        } catch (error) {
+            if (window.showToast) showToast('Failed: ' + error.message, 'error');
+        }
+    }
+
+    // Filters
     document.getElementById('category-filter')?.addEventListener('change', (e) => {
-        const category = e.target.value;
-        filteredIncome = category ? allIncome.filter(t => t.category === category) : allIncome;
-        currentPage = 0;
-        updateStats();
-        renderPage();
+        const cat = e.target.value;
+        filteredIncome = cat ? allIncome.filter(t => t.category === cat) : allIncome;
+        currentPage = 0; updateStats(); renderPage();
     });
 
-    // Search filter
     document.getElementById('search')?.addEventListener('input', (e) => {
-        const search = e.target.value.toLowerCase();
-        filteredIncome = search 
-            ? allIncome.filter(t => t.description.toLowerCase().includes(search))
-            : allIncome;
-        currentPage = 0;
-        updateStats();
-        renderPage();
+        const q = e.target.value.toLowerCase();
+        filteredIncome = q ? allIncome.filter(t => t.description.toLowerCase().includes(q)) : allIncome;
+        currentPage = 0; updateStats(); renderPage();
     });
 
-    // Load on page load
     loadIncome();
     </script>
 </body>

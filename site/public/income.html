@@ -125,9 +125,9 @@
 <p class="text-primary/70 text-sm font-bold uppercase tracking-[0.2em] mb-1">Financial Overview</p>
 <h1 class="text-5xl font-black tracking-tight">Income Management</h1>
 </div>
-<button class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-all duration-300 neon-glow group">
-<span class="material-symbols-outlined font-bold group-hover:rotate-90 transition-transform">add</span>
-<span>Add Income</span>
+<button id="scrollToIncomeForm" class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition-all duration-300 neon-glow group">
+<span class="material-symbols-outlined font-bold">keyboard_arrow_down</span>
+<span>Scroll to Form</span>
 </button>
 </header>
 <!-- Summary Cards -->
@@ -158,6 +158,37 @@
 </div>
 </div>
 </section>
+<!-- Inline Add Income Form -->
+<section class="glassmorphism p-8 rounded-3xl mb-6">
+    <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary">add_circle</span>
+        Add Income
+    </h2>
+    <form id="incomeForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div>
+            <label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Category</label>
+            <select id="incCategory" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                <option value="Salary">Salary</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Investment">Investment</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Description</label>
+            <input id="incDesc" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="e.g. Monthly Salary" required/>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Amount (₹)</label>
+            <input id="incAmount" type="number" step="0.01" min="0.01" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="0.00" required/>
+        </div>
+        <button type="submit" class="w-full bg-primary text-background-dark font-bold text-base py-3 px-6 rounded-xl neon-glow hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">add</span>
+            Add Income
+        </button>
+    </form>
+</section>
+
 <!-- Data & Chart Section -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 <!-- Records Table -->
@@ -223,36 +254,6 @@
 </div>
 </div>
 </main>
-</div>
-
-<!-- Add Income Modal -->
-<div id="incomeModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
-<div class="glassmorphism rounded-3xl p-10 w-full max-w-lg mx-4 relative">
-<button id="closeIncomeModal" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
-<span class="material-symbols-outlined">close</span>
-</button>
-<h2 class="text-2xl font-bold text-white mb-8">Add Income</h2>
-<form id="incomeForm" class="space-y-5">
-<div>
-<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Category</label>
-<select id="incCategory" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-<option value="Salary">Salary</option>
-<option value="Freelance">Freelance</option>
-<option value="Investment">Investment</option>
-<option value="Other">Other</option>
-</select>
-</div>
-<div>
-<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Description</label>
-<input id="incDesc" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="e.g. Monthly Salary" required/>
-</div>
-<div>
-<label class="block text-sm font-medium text-slate-400 mb-2 ml-1">Amount (₹)</label>
-<input id="incAmount" type="number" step="0.01" min="0.01" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-600" placeholder="0.00" required/>
-</div>
-<button type="submit" class="w-full bg-primary text-background-dark font-bold text-lg py-4 rounded-xl neon-glow hover:brightness-110 active:scale-[0.98] transition-all mt-2">Add Income</button>
-</form>
-</div>
 </div>
 
 <script src="api.js"></script>

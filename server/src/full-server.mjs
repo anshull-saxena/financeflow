@@ -32,14 +32,17 @@ app.use('/static', express.static(path.join(__dirname, '../../financeflow')));
   }
 })();
 
-// Routes - Serve pages
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/dashboard/code.html')));
-app.get('/expenses', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/expenses_page/expenses-dynamic.html')));
-app.get('/income', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/income_page/income-dynamic.html')));
+// Routes - Serve pages (Premium Frontend from site/public)
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/dashboard.html')));
+app.get('/expenses', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/expenses.html')));
+app.get('/income', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/income.html')));
+app.get('/settings', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/settings.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/index.html')));
+app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/onboarding.html')));
 app.get('/analytics', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/reports_analytics/analytics-dynamic.html')));
-app.get('/settings', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/settings/settings-dynamic.html')));
-app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/auth/login.html')));
-app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, '../../financeflow/auth/signup.html')));
+
+// Serve static files from site/public
+app.use(express.static(path.join(__dirname, '../../site/public')));
 
 // API: Health check
 app.get('/health', (req, res) => {
@@ -114,17 +117,21 @@ app.get('/api/transactions/:id', async (req, res) => {
 app.post('/api/transactions', async (req, res) => {
   try {
     const { type, description, category, amount, currency = 'INR', occurredAt } = req.body;
+    console.log('Creating transaction:', { type, description, category, amount, currency, occurredAt });
+    
     if (!type || !description || !category || !amount) {
+      console.log('Missing required fields');
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
-    
+
     const newTx = await dataAccess.createTransaction('1', {
       type, description, category,
       amount: parseFloat(amount),
       currency,
       occurredAt: occurredAt || new Date().toISOString()
     });
-    
+
+    console.log('Transaction created:', newTx);
     res.status(201).json({ success: true, data: newTx });
   } catch (error) {
     console.error('Create transaction error:', error);
@@ -207,15 +214,16 @@ app.get('/api/settings', async (req, res) => {
 // API: Update user settings
 app.put('/api/settings', async (req, res) => {
   try {
-    const { currency, monthlyGoal, emailNotif, darkMode, twoFactor } = req.body;
+    const { currency, monthlyGoal, emailNotif, emailNotifications, budgetAlerts, darkMode, twoFactor } = req.body;
     const success = await dataAccess.updateUserSettings('1', {
       currency,
       monthlyGoal: parseFloat(monthlyGoal),
-      emailNotif: Boolean(emailNotif),
+      emailNotif: Boolean(emailNotif || emailNotifications),
+      budgetAlerts: Boolean(budgetAlerts),
       darkMode: Boolean(darkMode),
       twoFactor: Boolean(twoFactor)
     });
-    
+
     if (!success) return res.status(500).json({ success: false, error: 'Failed to update settings' });
     res.json({ success: true, message: 'Settings updated successfully' });
   } catch (error) {

@@ -104,17 +104,23 @@ export async function getTransactionById(id) {
 }
 
 export async function createTransaction(userId = '1', data) {
+  console.log('dataAccess.createTransaction called with:', { userId, data });
+  
   if (await isMySQL()) {
+    console.log('Using MySQL to create transaction');
     const id = await mysqlQueries.createTransaction(userId, data);
+    console.log('MySQL transaction created with ID:', id);
     return id ? await mysqlQueries.getTransactionById(id) : null;
   }
-  
+
+  console.log('Using in-memory storage to create transaction');
   const newTx = {
     id: Math.max(...memoryTransactions.map(t => t.id)) + 1,
     ...data,
     amount: parseFloat(data.amount)
   };
   memoryTransactions.push(newTx);
+  console.log('In-memory transaction created:', newTx);
   return newTx;
 }
 
@@ -174,41 +180,106 @@ export async function updateUserSettings(userId = '1', settings) {
 
 export async function getTransactionStats(userId = '1') {
   const transactions = await getTransactions(userId);
-  
+
   const totalIncome = transactions
     .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
-    
+
   const totalExpenses = transactions
     .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
-    
+
   const balance = totalIncome - totalExpenses;
   const savingsRate = totalIncome > 0 ? Math.round((balance / totalIncome) * 100) : 0;
+
+  // Calculate monthly data dynamically from actual transactions
+  const now = new Date();
+  const monthlyData = [];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
-  const monthlyData = [
-    { month: 'Jan', income: 12000, expenses: 3200 },
-    { month: 'Feb', income: 11800, expenses: 2900 },
-    { month: 'Mar', income: 13200, expenses: 3100 },
-    { month: 'Apr', income: 12450, expenses: 2850 },
-    { month: 'May', income: 14100, expenses: 3300 },
-    { month: 'Jun', income: totalIncome, expenses: totalExpenses }
-  ];
+  // Get last 6 months
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    
+    const monthIncome = transactions
+      .filter(t => t.type === 'income' && (t.occurredAt || t.date).startsWith(monthKey))
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const monthExpenses = transactions
+      .filter(t => t.type === 'expense' && (t.occurredAt || t.date).startsWith(monthKey))
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    monthlyData.push({
+      month: monthNames[d.getMonth()],
+      income: monthIncome,
+      expenses: monthExpenses
+    });
+  }
+
+  // Calculate weekly trend for current month
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const monthTransactions = transactions.filter(t => (t.occurredAt || t.date).startsWith(currentMonth));
   
-  const weeklyTrend = [
-    { week: 'Week 1', income: 3200, expenses: 800 },
-    { week: 'Week 2', income: 2800, expenses: 900 },
-    { week: 'Week 3', income: 4100, expenses: 750 },
-    { week: 'Week 4', income: totalIncome * 0.25, expenses: totalExpenses * 0.25 }
-  ];
-  
+  const weeklyTrend = [];
+  for (let week = 0; week < 4; week++) {
+    const weekStart = week * 7;
+    const weekEnd = weekStart + 7;
+    
+    const weekIncome = monthTransactions
+      .filter(t => {
+        const day = new Date(t.occurredAt || t.date).getDate();
+        return t.type === 'income' && day > weekStart && day <= weekEnd;
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    const weekExpenses = monthTransactions
+      .filter(t => {
+        const day = new Date(t.occurredAt || t.date).getDate();
+        return t.type === 'expense' && day > weekStart && day <= weekEnd;
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+    
+    weeklyTrend.push({
+      week: `Week ${week + 1}`,
+      income: weekIncome,
+      expenses: weekExpenses
+    });
+  }
+
+  // Category breakdown
   const categoryBreakdown = transactions
     .filter(t => t.type === 'expense')
     .reduce((acc, t) => {
       acc[t.category] = (acc[t.category] || 0) + t.amount;
       return acc;
     }, {});
+
+  // Financial Health Score calculation (0-100)
+  // Based on: savings rate (40%), expense consistency (30%), income growth (30%)
+  const savingsRateScore = Math.min(100, Math.round(savingsRate * 2)); // 40% weight
   
+  // Expense consistency - lower is better
+  const expenseScore = totalExpenses > 0 && totalIncome > 0 
+    ? Math.max(0, 100 - Math.round((totalExpenses / totalIncome) * 100))
+    : 50;
+  
+  // Income growth - compare this month to last month
+  const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthKey = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}`;
+  const lastMonthIncome = transactions
+    .filter(t => t.type === 'income' && (t.occurredAt || t.date).startsWith(lastMonthKey))
+    .reduce((sum, t) => sum + t.amount, 0);
+  
+  const incomeGrowth = lastMonthIncome > 0 
+    ? ((totalIncome - lastMonthIncome) / lastMonthIncome) * 100
+    : 0;
+  const incomeGrowthScore = Math.min(100, Math.max(0, 50 + Math.round(incomeGrowth * 2)));
+  
+  const financialHealthScore = Math.round(
+    (savingsRateScore * 0.4) + (expenseScore * 0.3) + (incomeGrowthScore * 0.3)
+  );
+
   return {
     totalIncome,
     totalExpenses,
@@ -217,6 +288,6 @@ export async function getTransactionStats(userId = '1') {
     monthlyData,
     weeklyTrend,
     categoryBreakdown,
-    financialHealthScore: Math.min(100, Math.round(savingsRate * 1.5))
+    financialHealthScore: Math.min(100, Math.max(0, financialHealthScore))
   };
 }

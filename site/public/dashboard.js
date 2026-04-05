@@ -8,7 +8,10 @@ let appData = {
 const ICONS = { Salary:'payments', Freelance:'work', Investment:'show_chart', Food:'restaurant', Housing:'home', Transport:'flight', Entertainment:'movie', Technology:'shopping_bag', Other:'more_horiz' };
 
 // ── Helpers ─────────────────────────────────────────
-function fmt(n) { return '₹' + n.toLocaleString('en-US', { minimumFractionDigits: 2 }); }
+function fmt(n) { 
+    const symbol = API.getCurrencySymbol();
+    return symbol + n.toLocaleString('en-US', { minimumFractionDigits: 2 }); 
+}
 
 function calcPctChange(current, previous) {
     if (previous === 0 && current === 0) return { text: '—', positive: true };
@@ -221,7 +224,7 @@ async function renderUI(serverStats) {
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
-                        <p class="${isIncome ? 'text-primary' : 'text-white'} font-bold">${isIncome ? '+' : '-'}₹${Math.abs(t.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                        <p class="${isIncome ? 'text-primary' : 'text-white'} font-bold">${isIncome ? '+' : '-'}${API.getCurrencySymbol()}${Math.abs(t.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
                         <p class="text-slate-500 text-xs uppercase font-bold mt-1">${dateStr}</p>
                     </div>
                     <button class="delete-txn opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all" data-id="${t.id}">
@@ -257,8 +260,8 @@ async function renderUI(serverStats) {
                 <div class="bg-${colorClass} h-full ${barShadow} transition-all duration-700" style="width: ${pct}%"></div>
             </div>
             <div class="flex justify-between mt-3">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Saved: ₹${(g.saved || g.savedAmount).toLocaleString()}</p>
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target: ₹${(g.target || g.targetAmount).toLocaleString()}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Saved: ${API.getCurrencySymbol()}${(g.saved || g.savedAmount).toLocaleString()}</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Target: ${API.getCurrencySymbol()}${(g.target || g.targetAmount).toLocaleString()}</p>
             </div>
         </div>`;
     }).join('');
@@ -315,14 +318,16 @@ document.getElementById('txnForm').addEventListener('submit', async e => {
     };
     
     try {
-        await API.post('/transactions', payload);
+        const result = await API.post('/transactions', payload);
+        console.log('Transaction created successfully:', result);
         txnModal.classList.add('hidden'); txnModal.classList.remove('flex');
         e.target.reset();
         document.getElementById('txnType').value = 'income';
         document.querySelectorAll('.txn-type-btn')[0].click();
         await loadDashboard();
     } catch (err) {
-        window.showAppAlert('Failed to create transaction.');
+        console.error('Failed to create transaction:', err);
+        window.showAppAlert('Failed to create transaction: ' + err.message);
     } finally {
         submitBtn.textContent = 'Add Transaction';
     }

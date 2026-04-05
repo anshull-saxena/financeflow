@@ -27,19 +27,20 @@ function renderIncome() {
     const now = new Date();
     const curMonth = getMonthKey(now);
     const prevMonth = getMonthKey(new Date(now.getFullYear(), now.getMonth() - 1, 1));
-    
+
     // Update Stats
     const total = incomeTxns.reduce((sum, t) => sum + t.amount, 0);
+    const symbol = API.getCurrencySymbol();
     const curMonthIncome = incomeTxns.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === curMonth).reduce((s, t) => s + t.amount, 0);
     const prevMonthIncome = incomeTxns.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === prevMonth).reduce((s, t) => s + t.amount, 0);
     
-    document.getElementById('statTotalIncome').textContent = '₹' + total.toLocaleString('en-US', {minimumFractionDigits: 2});
-    
+    document.getElementById('statTotalIncome').textContent = symbol + total.toLocaleString('en-US', {minimumFractionDigits: 2});
+
     // Unique months with income
     const monthSet = new Set(incomeTxns.map(t => getMonthKey(new Date(t.occurredAt || t.date))));
     const numMonths = monthSet.size || 1;
     const avgMonthly = total / numMonths;
-    document.getElementById('statAvgIncome').textContent = '₹' + avgMonthly.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('statAvgIncome').textContent = symbol + avgMonthly.toLocaleString('en-US', {minimumFractionDigits: 2});
     document.getElementById('statIncomeCount').textContent = incomeTxns.length.toString().padStart(2, '0');
 
     // Trend badges
@@ -84,7 +85,7 @@ function renderIncome() {
                     </div>
                 </td>
                 <td class="px-6 py-6 text-slate-400 text-sm">${t.category}</td>
-                <td class="px-6 py-6 font-bold text-primary">₹${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+                <td class="px-6 py-6 font-bold text-primary">${symbol}${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
                 <td class="px-6 py-6 flex items-center justify-end gap-3">
                     <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold">Cleared</span>
                     <button class="delete-inc opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all ml-2" data-id="${t.id}">
@@ -122,7 +123,7 @@ function renderBarChart(incomeTxns) {
         const glow = isCurrent ? 'neon-glow' : '';
         const labelColor = isCurrent ? 'text-primary' : 'text-slate-500';
         return `<div class="flex-1 flex flex-col items-center gap-3">
-            <div class="w-full bg-gradient-to-t ${gradient} rounded-t-lg ${glow} transition-all duration-500" style="height: ${height}px;" title="₹${amt.toLocaleString()}"></div>
+            <div class="w-full bg-gradient-to-t ${gradient} rounded-t-lg ${glow} transition-all duration-500" style="height: ${height}px;" title="${symbol}${amt.toLocaleString()}"></div>
             <span class="text-[10px] font-bold ${labelColor} uppercase">${getMonthLabel(mk)}</span>
         </div>`;
     }).join('');
@@ -165,19 +166,14 @@ document.getElementById('incomeTbody').addEventListener('click', async function(
     }
 });
 
-const modal = document.getElementById('incomeModal');
-
-// Add Income button
-document.querySelectorAll('button').forEach(btn => {
-    if (btn.textContent.includes('Add Income') && !btn.closest('#incomeModal')) {
-        btn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        });
+// Scroll to form button
+document.getElementById('scrollToIncomeForm')?.addEventListener('click', () => {
+    const form = document.getElementById('incomeForm');
+    if (form) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        form.querySelector('#incCategory')?.focus();
     }
 });
-document.getElementById('closeIncomeModal').addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex'); });
-modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }});
 
 // Add income form
 document.getElementById('incomeForm').addEventListener('submit', async function(e) {
@@ -201,9 +197,9 @@ document.getElementById('incomeForm').addEventListener('submit', async function(
             currency: 'INR',
             occurredAt: occurredAt
         });
-        
-        modal.classList.add('hidden'); modal.classList.remove('flex');
+
         this.reset();
+        window.showAppAlert('Income added successfully!', 'success');
         await loadIncomeData();
     } catch (err) {
         window.showAppAlert('Failed to add income: ' + err.message);

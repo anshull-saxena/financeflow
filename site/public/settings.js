@@ -26,6 +26,12 @@ async function loadSettings() {
             }
         }
 
+        // Currency
+        const currencySelector = document.getElementById('currencySelector');
+        if (currencySelector) {
+            currencySelector.value = settings.currency || localStorage.getItem('ff_currency') || 'INR';
+        }
+
         // Toggles
         const toggles = document.querySelectorAll('input[type="checkbox"]');
         if (toggles.length >= 3) {
@@ -153,7 +159,7 @@ toggleInputs.forEach((input, i) => {
 
         // Backup to localstorage
         localStorage.setItem(toggleKeys[i], input.checked);
-        
+
         if (toggleKeys[i] === 'ff_darkMode') {
             if (input.checked) {
                 document.documentElement.classList.remove('light');
@@ -164,4 +170,18 @@ toggleInputs.forEach((input, i) => {
             }
         }
     });
+});
+
+// Persist currency changes
+document.getElementById('currencySelector')?.addEventListener('change', async function() {
+    const currency = this.value;
+    try {
+        await API.put('/settings', { currency });
+        localStorage.setItem('ff_currency', currency);
+        window.showAppAlert('Currency updated! Changes will apply to new transactions.');
+    } catch (e) {
+        console.error('Failed to update currency on server', e);
+        localStorage.setItem('ff_currency', currency);
+        window.showAppAlert('Currency saved locally. Server sync will occur when available.');
+    }
 });

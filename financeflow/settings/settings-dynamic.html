@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - FinancePro</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Settings - FinanceFlow</title>
+    <script src="/static/shared/darkmode.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: "class" }</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
@@ -12,38 +14,38 @@
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
     </style>
 </head>
-<body class="bg-gray-50 flex min-h-screen">
+<body class="bg-gray-50 dark:bg-slate-900 dark:text-slate-100 flex min-h-screen">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-gray-200 fixed h-full">
+    <aside class="w-64 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 fixed h-full overflow-y-auto">
         <div class="p-6">
             <div class="flex items-center gap-3 mb-8">
                 <div class="bg-blue-600 rounded-lg p-2 text-white">
                     <span class="material-symbols-outlined">account_balance_wallet</span>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold">FinancePro</h1>
-                    <p class="text-xs text-gray-500">Personal Manager</p>
+                    <h1 class="text-lg font-bold dark:text-white">FinanceFlow</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Personal Manager</p>
                 </div>
             </div>
             <nav class="space-y-2">
-                <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span class="text-sm">Dashboard</span>
                 </a>
-                <a href="/income" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <a href="/income" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined">trending_up</span>
                     <span class="text-sm">Income</span>
                 </a>
-                <a href="/expenses" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <a href="/expenses" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined">trending_down</span>
                     <span class="text-sm">Expenses</span>
                 </a>
-                <a href="/analytics" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                <a href="/analytics" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700">
                     <span class="material-symbols-outlined">pie_chart</span>
                     <span class="text-sm">Analytics</span>
                 </a>
-                <div class="pt-4 mt-4 border-t border-gray-200">
-                    <a href="/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-semibold">
+                <div class="pt-4 mt-4 border-t border-gray-200 dark:border-slate-600">
+                    <a href="/settings" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold">
                         <span class="material-symbols-outlined">settings</span>
                         <span class="text-sm">Settings</span>
                     </a>
@@ -55,42 +57,42 @@
     <!-- Main Content -->
     <div class="ml-64 flex-1 p-8">
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Settings</h1>
-            <p class="text-gray-600 mt-2">Manage your account and preferences</p>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Manage your account and preferences</p>
         </div>
 
         <!-- User Profile Section -->
-        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined">person</span>
                 User Profile
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                    <input type="text" id="user-name" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                    <input type="text" id="user-name"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="John Doe">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="email" id="user-email" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                    <input type="email" id="user-email"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="john@example.com">
                 </div>
             </div>
         </div>
 
         <!-- Financial Settings -->
-        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined">account_balance</span>
                 Financial Settings
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Currency</label>
-                    <select id="currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Currency</label>
+                    <select id="currency" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="INR">INR (₹)</option>
                         <option value="USD">USD ($)</option>
                         <option value="EUR">EUR (€)</option>
@@ -98,25 +100,25 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Monthly Budget Goal</label>
-                    <input type="number" id="monthly-goal" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Monthly Budget Goal</label>
+                    <input type="number" id="monthly-goal"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="50000">
                 </div>
             </div>
         </div>
 
         <!-- Notification Settings -->
-        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined">notifications</span>
                 Notifications
             </h2>
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="font-medium text-gray-900">Email Notifications</p>
-                        <p class="text-sm text-gray-600">Receive email updates about your transactions</p>
+                        <p class="font-medium text-gray-900 dark:text-white">Email Notifications</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Receive email updates about your transactions</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="email-notifications" class="sr-only peer">
@@ -125,8 +127,8 @@
                 </div>
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="font-medium text-gray-900">Budget Alerts</p>
-                        <p class="text-sm text-gray-600">Get notified when you exceed your budget</p>
+                        <p class="font-medium text-gray-900 dark:text-white">Budget Alerts</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Get notified when you exceed your budget</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="budget-alerts" class="sr-only peer">
@@ -137,16 +139,16 @@
         </div>
 
         <!-- Security Settings -->
-        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined">security</span>
                 Security
             </h2>
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="font-medium text-gray-900">Two-Factor Authentication</p>
-                        <p class="text-sm text-gray-600">Add an extra layer of security to your account</p>
+                        <p class="font-medium text-gray-900 dark:text-white">Two-Factor Authentication</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Add an extra layer of security to your account</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="two-factor" class="sr-only peer">
@@ -157,16 +159,16 @@
         </div>
 
         <!-- Appearance Settings -->
-        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
                 <span class="material-symbols-outlined">palette</span>
                 Appearance
             </h2>
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="font-medium text-gray-900">Dark Mode</p>
-                        <p class="text-sm text-gray-600">Switch to dark theme</p>
+                        <p class="font-medium text-gray-900 dark:text-white">Dark Mode</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Switch to dark theme</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="dark-mode" class="sr-only peer">
@@ -181,7 +183,7 @@
             <button onclick="saveSettings()" class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
                 Save Changes
             </button>
-            <button onclick="loadSettings()" class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold">
+            <button onclick="loadSettings()" class="px-8 py-3 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-600 font-semibold">
                 Reset
             </button>
         </div>
@@ -190,24 +192,35 @@
     <script src="/static/shared/financeflow.js"></script>
     <script src="/static/shared/toast.js"></script>
     <script>
+    // Settings cache
+    let currentSettings = {};
+
     async function loadSettings() {
         try {
             const response = await fetch('/api/settings');
             const result = await response.json();
-            const settings = result.data;
-            
+
+            if (!result.success) {
+                console.error('Failed to load settings:', result.error);
+                return;
+            }
+
+            const data = result.data;
+            currentSettings = data.settings || {};
+
             // Populate form fields
-            document.getElementById('user-name').value = settings.userName || '';
-            document.getElementById('user-email').value = settings.email || '';
-            document.getElementById('currency').value = settings.currency || 'INR';
-            document.getElementById('monthly-goal').value = settings.monthlyGoal || '';
-            document.getElementById('email-notifications').checked = settings.emailNotifications || false;
-            document.getElementById('budget-alerts').checked = settings.budgetAlerts || false;
-            document.getElementById('two-factor').checked = settings.twoFactor || false;
+            document.getElementById('user-name').value = data.user?.name || '';
+            document.getElementById('user-email').value = data.user?.email || '';
+            document.getElementById('currency').value = currentSettings.currency || 'INR';
+            document.getElementById('monthly-goal').value = currentSettings.monthlyGoal || '';
+            document.getElementById('email-notifications').checked = currentSettings.emailNotif || false;
+            document.getElementById('budget-alerts').checked = currentSettings.budgetAlerts || false;
+            document.getElementById('two-factor').checked = currentSettings.twoFactor || false;
             document.getElementById('dark-mode').checked = DarkMode.isEnabled();
-            
+
         } catch (error) {
             console.error('Error loading settings:', error);
+            if (window.showToast) showToast('Failed to load settings', 'error');
         }
     }
 
@@ -217,37 +230,74 @@
             email: document.getElementById('user-email').value,
             currency: document.getElementById('currency').value,
             monthlyGoal: parseFloat(document.getElementById('monthly-goal').value) || 0,
-            emailNotifications: document.getElementById('email-notifications').checked,
+            emailNotif: document.getElementById('email-notifications').checked,
             budgetAlerts: document.getElementById('budget-alerts').checked,
             twoFactor: document.getElementById('two-factor').checked,
             darkMode: document.getElementById('dark-mode').checked
         };
-        
+
         try {
             const response = await fetch('/api/settings', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settings)
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 // Apply dark mode
                 DarkMode.set(settings.darkMode);
-                alert('Settings saved successfully!');
+                currentSettings = settings;
+                if (window.showToast) showToast('Settings saved successfully!', 'success');
             } else {
-                alert('Failed to save settings: ' + result.error);
+                if (window.showToast) showToast('Failed to save settings: ' + result.error, 'error');
             }
         } catch (error) {
-            alert('Error saving settings: ' + error.message);
+            if (window.showToast) showToast('Error saving settings: ' + error.message, 'error');
         }
     }
 
-    // Dark mode toggle
-    document.getElementById('dark-mode').addEventListener('change', (e) => {
-        DarkMode.set(e.target.checked);
+    // Auto-save toggles on change
+    document.getElementById('email-notifications')?.addEventListener('change', async (e) => {
+        currentSettings.emailNotif = e.target.checked;
+        await autoSaveSetting();
     });
+
+    document.getElementById('budget-alerts')?.addEventListener('change', async (e) => {
+        currentSettings.budgetAlerts = e.target.checked;
+        await autoSaveSetting();
+    });
+
+    document.getElementById('two-factor')?.addEventListener('change', async (e) => {
+        currentSettings.twoFactor = e.target.checked;
+        await autoSaveSetting();
+    });
+
+    document.getElementById('dark-mode')?.addEventListener('change', async (e) => {
+        DarkMode.set(e.target.checked);
+        currentSettings.darkMode = e.target.checked;
+        await autoSaveSetting();
+    });
+
+    async function autoSaveSetting() {
+        try {
+            await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currency: currentSettings.currency || 'INR',
+                    monthlyGoal: parseFloat(currentSettings.monthlyGoal) || 0,
+                    emailNotif: currentSettings.emailNotif || false,
+                    budgetAlerts: currentSettings.budgetAlerts || false,
+                    twoFactor: currentSettings.twoFactor || false,
+                    darkMode: currentSettings.darkMode || false
+                })
+            });
+        } catch (error) {
+            console.error('Auto-save failed:', error);
+        }
+    }
 
     // Load settings on page load
     loadSettings();

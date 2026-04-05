@@ -12,7 +12,6 @@ async function loadUser() {
 }
 loadUser();
 
-const modal = document.getElementById('expenseModal');
 const catIcons = { Housing: 'home', Food: 'shopping_cart', Transport: 'directions_car', Entertainment: 'movie', Technology: 'devices', Other: 'more_horiz' };
 const catColors = { Housing: 'orange', Food: 'emerald', Transport: 'blue', Entertainment: 'purple', Technology: 'indigo', Other: 'slate' };
 const DONUT_COLORS = ['#00eeff', '#a855f7', '#f97316', '#34d399', '#60a5fa', '#94a3b8'];
@@ -41,9 +40,10 @@ function renderExpenses() {
     
     // Stats
     const total = expenses.reduce((sum, t) => sum + t.amount, 0);
-    document.getElementById('statTotalExp').innerHTML = `₹${Math.floor(total).toLocaleString()}<span class="text-xl text-primary/50">.${(total%1).toFixed(2).substring(2).padEnd(2, '0')}</span>`;
+    const symbol = API.getCurrencySymbol();
+    document.getElementById('statTotalExp').innerHTML = `${symbol}${Math.floor(total).toLocaleString()}<span class="text-xl text-primary/50">.${(total%1).toFixed(2).substring(2).padEnd(2, '0')}</span>`;
     document.getElementById('statExpCount').textContent = expenses.length;
-    document.getElementById('statExpAvg').textContent = `Avg. ₹${(total / (expenses.length || 1)).toFixed(2)} per transaction`;
+    document.getElementById('statExpAvg').textContent = `Avg. ${symbol}${(total / (expenses.length || 1)).toFixed(2)} per transaction`;
     
     // Month-over-month trend
     const curMonthTotal = expenses.filter(t => getMonthKey(new Date(t.occurredAt || t.date)) === curMonth).reduce((s, t) => s + t.amount, 0);
@@ -71,7 +71,7 @@ function renderExpenses() {
     }
     const biggestPct = total > 0 ? Math.round((biggestAmt / total) * 100) : 0;
     document.getElementById('statBiggestCatName').textContent = biggestCat;
-    document.getElementById('statBiggestCatAmount').textContent = `₹${biggestAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    document.getElementById('statBiggestCatAmount').textContent = `${symbol}${biggestAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
     document.getElementById('statBiggestCatPct').textContent = `| ${biggestPct}% of total`;
 
     // Distribution donut chart
@@ -98,7 +98,7 @@ function renderExpenses() {
                     </div><span class="font-bold text-white">${t.category}</span></div></td>
                 <td class="px-6 py-6 text-slate-300 font-medium">${t.desc || t.description}</td>
                 <td class="px-6 py-6 text-right flex items-center justify-end gap-4 h-full">
-                    <span class="text-white font-black text-lg group-hover:text-primary transition-colors">₹${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                    <span class="text-white font-black text-lg group-hover:text-primary transition-colors">${symbol}${t.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
                     <button class="delete-exp opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all" data-id="${t.id}">
                         <span class="material-symbols-outlined text-lg">delete</span>
                     </button>
@@ -176,7 +176,7 @@ function renderSmartSuggestion(expenses, catMap, curTotal, prevTotal) {
     
     if (prevTotal > 0 && curTotal < prevTotal) {
         const saved = prevTotal - curTotal;
-        el.innerHTML = `Great job! You've spent <span class="text-primary font-bold">₹${saved.toFixed(0)} less</span> this month compared to last month. Consider adding the difference to your savings goals!`;
+        el.innerHTML = `Great job! You've spent <span class="text-primary font-bold">${symbol}${saved.toFixed(0)} less</span> this month compared to last month. Consider adding the difference to your savings goals!`;
     } else if (bigPct > 50) {
         el.innerHTML = `<span class="text-primary font-bold">${biggest[0]}</span> accounts for ${bigPct}% of your expenses. Consider reviewing this category for potential savings.`;
     } else if (expenses.length >= 5) {
@@ -203,16 +203,16 @@ document.getElementById('expenseTbody').addEventListener('click', async function
     }
 });
 
-// Add Expense button
-document.querySelectorAll('button').forEach(btn => {
-    if (btn.textContent.includes('Add Expense') && !btn.classList.contains('filter-pill')) {
-        btn.addEventListener('click', () => { modal.classList.remove('hidden'); modal.classList.add('flex'); });
+// Scroll to form button
+document.getElementById('scrollToExpenseForm')?.addEventListener('click', () => {
+    const form = document.getElementById('expenseForm');
+    if (form) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        form.querySelector('#expCategory')?.focus();
     }
 });
-document.getElementById('closeExpenseModal').addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex'); });
-modal.addEventListener('click', e => { if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }});
 
-// Submit expense
+// Submit expense form
 document.getElementById('expenseForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = this.querySelector('button[type="submit"]');
@@ -234,8 +234,8 @@ document.getElementById('expenseForm').addEventListener('submit', async function
             currency: 'INR',
             occurredAt: occurredAt
         });
-        modal.classList.add('hidden'); modal.classList.remove('flex');
         this.reset();
+        window.showAppAlert('Expense added successfully!', 'success');
         await loadExpensesData();
     } catch(err) {
         window.showAppAlert('Failed to add expense');
