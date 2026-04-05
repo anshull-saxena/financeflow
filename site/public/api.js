@@ -2,7 +2,9 @@
  * Central API Helper
  * Manages communication with the FinanceFlow Express backend.
  */
-const API_BASE = 'http://localhost:3001/api';
+// On Vercel and in local server mode, the frontend and API share the same origin.
+// Using a relative base keeps this working across environments.
+const API_BASE = '/api';
 
 const API = {
     // Get Authorization Token

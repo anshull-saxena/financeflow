@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import dotenv from 'dotenv';
 import { getPool } from './db/connection.mjs';
 import * as dataAccess from './data-access.mjs';
@@ -277,12 +277,16 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`\n🚀 FinanceFlow Server Started`);
-  console.log(`================================`);
-  console.log(`📍 Local:   http://localhost:${PORT}`);
-  console.log(`🔧 API:     http://localhost:${PORT}/api`);
-  console.log(`💚 Health:  http://localhost:${PORT}/health`);
-  console.log(`================================\n`);
-});
+export default app;
+
+// Start server only when executed directly (not when imported by Vercel serverless)
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 FinanceFlow Server Started`);
+    console.log(`================================`);
+    console.log(`📍 Local:   http://localhost:${PORT}`);
+    console.log(`🔧 API:     http://localhost:${PORT}/api`);
+    console.log(`💚 Health:  http://localhost:${PORT}/health`);
+    console.log(`================================\n`);
+  });
+}

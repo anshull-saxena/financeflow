@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": ["server/src/**", "site/public/**", "financeflow/**"]
+    }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/api/index?__path=" },
+    { "source": "/(.*)", "destination": "/api/index?__path=$1" }
+  ]
+}
+
