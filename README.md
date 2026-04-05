@@ -33,8 +33,19 @@ http://localhost:3001
 ### Option 1: In-Memory (Default - No Setup)
 Perfect for development and demos. Data resets on server restart.
 
-### Option 2: MySQL (For Persistence)
-Run the automatic setup script:
+### Option 2: Cloud MySQL (Persistent)
+Set a managed MySQL connection string:
+
+```bash
+# Example (PlanetScale/Aiven/RDS-compatible MySQL URL)
+DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/financeflow
+DB_SSL=true
+```
+
+Then start the app normally. FinanceFlow now auto-runs SQL migrations on first connection.
+
+### Option 3: Local MySQL (For Persistence)
+Run the automatic local setup script:
 ```bash
 cd server
 ./setup-mysql.sh
@@ -147,7 +158,13 @@ node src/full-server.mjs
 
 ## 🚢 Deployment
 
-### With MySQL
+### With Cloud SQL (Recommended for production)
+1. Create a managed MySQL database (PlanetScale, Aiven, RDS, etc.)
+2. Add `DATABASE_URL` in your hosting provider (Vercel/Render/Railway)
+3. Set `DB_SSL=true` if your provider requires TLS
+4. Redeploy/start server (migrations run automatically)
+
+### With Local MySQL
 1. Set up MySQL on server
 2. Run `./setup-mysql.sh`
 3. Configure `.env` file
@@ -170,6 +187,11 @@ Data persists in memory (resets on restart).
 
 Create `server/.env`:
 ```env
+# Preferred for cloud SQL:
+DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/financeflow
+DB_SSL=true
+
+# Or use discrete DB_* variables:
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=financeflow

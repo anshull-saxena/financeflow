@@ -30,7 +30,7 @@ app.use('/static', express.static(path.join(__dirname, '../../financeflow')));
   if (pool) {
     console.log('📊 Using MySQL database for data persistence');
   } else {
-    console.log('💾 Using in-memory storage (run ./setup-mysql.sh to enable MySQL)');
+    console.log('💾 Using in-memory storage (set DATABASE_URL or run ./setup-mysql.sh to enable MySQL)');
   }
 })();
 

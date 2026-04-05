@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { ensureDatabaseSchema } from './migrations.mjs';
 
 dotenv.config();
 
@@ -34,21 +35,40 @@ function getPoolConfig() {
 }
 
 let pool = null;
+let poolInitPromise = null;
 
 export async function getPool() {
-  if (!pool) {
-    try {
-      pool = mysql.createPool(getPoolConfig());
-      // Test connection
-      const connection = await pool.getConnection();
-      console.log('✅ MySQL connected successfully');
-      connection.release();
-    } catch (error) {
-      console.log('⚠️  MySQL not available, using in-memory storage');
-      console.log('   Run setup-mysql.sh to set up MySQL database');
-      pool = null;
-    }
+  if (pool) return pool;
+
+  if (!poolInitPromise) {
+    poolInitPromise = (async () => {
+      let createdPool = null;
+      try {
+        createdPool = mysql.createPool(getPoolConfig());
+        const connection = await createdPool.getConnection();
+        connection.release();
+
+        await ensureDatabaseSchema(createdPool);
+        console.log('✅ MySQL connected successfully');
+        pool = createdPool;
+      } catch (error) {
+        console.log('⚠️  MySQL not available, using in-memory storage');
+        console.log('   Set DATABASE_URL (or DB_* env vars) to enable persistent SQL storage');
+        if (createdPool) {
+          try {
+            await createdPool.end();
+          } catch (_endError) {
+            // no-op
+          }
+        }
+        pool = null;
+      } finally {
+        poolInitPromise = null;
+      }
+    })();
   }
+
+  await poolInitPromise;
   return pool;
 }
 

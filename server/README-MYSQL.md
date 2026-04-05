@@ -23,6 +23,15 @@ The app works immediately! Data is stored in memory (resets on restart).
 
 ### Option 2: Enable MySQL for Data Persistence
 
+For cloud-hosted SQL (recommended on Vercel), set:
+
+```env
+DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/financeflow
+DB_SSL=true
+```
+
+Then start the app. Migrations run automatically when MySQL is reachable.
+
 Run the automatic setup script:
 ```bash
 cd server
@@ -34,7 +43,6 @@ The script will:
 2. Create database and user
 3. Run migrations
 4. Create .env file
-5. Optionally seed demo data
 
 **That's it!** Restart the server and your data persists forever.
 
@@ -106,6 +114,10 @@ Done! All your data structure is ready.
 Create `.env` file (or use defaults):
 
 ```env
+DATABASE_URL=
+DB_SSL=false
+DB_SSL_REJECT_UNAUTHORIZED=true
+
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=financeflow

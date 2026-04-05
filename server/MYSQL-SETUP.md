@@ -4,6 +4,19 @@ This guide explains how to set up MySQL database for FinanceFlow on any device.
 
 ## Quick Setup (Recommended)
 
+### Option A: Cloud MySQL (Vercel-friendly)
+
+Use any managed MySQL provider (PlanetScale, Aiven, AWS RDS, etc.) and set:
+
+```env
+DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/financeflow
+DB_SSL=true
+```
+
+Then start/redeploy the app. Migrations are applied automatically at startup.
+
+### Option B: Local MySQL
+
 Run the automatic setup script:
 
 ```bash
@@ -17,7 +30,6 @@ The script will:
 3. ✅ Create database and user
 4. ✅ Run migrations to create tables
 5. ✅ Create .env configuration file
-6. ✅ Optionally seed demo data
 
 ## Manual Setup
 
@@ -73,6 +85,10 @@ cp .env.example .env
 
 Edit `.env` if needed (default values should work):
 ```env
+DATABASE_URL=
+DB_SSL=false
+DB_SSL_REJECT_UNAUTHORIZED=true
+
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=financeflow
