@@ -1,4 +1,4 @@
-import { query } from './connection.mjs';
+import { getDialect, query } from './connection.mjs';
 
 // ============ USER QUERIES ============
 
@@ -25,14 +25,25 @@ export async function createUser(name, email) {
 }
 
 export async function ensureUserById(id, name, email) {
-  await query(
-    `INSERT INTO users (id, name, email)
-     VALUES (?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-       name = VALUES(name),
-       email = VALUES(email)`,
-    [id, name, email]
-  );
+  if (getDialect() === 'postgres') {
+    await query(
+      `INSERT INTO users (id, name, email)
+       VALUES (?, ?, ?)
+       ON CONFLICT (id) DO UPDATE SET
+         name = EXCLUDED.name,
+         email = EXCLUDED.email`,
+      [id, name, email]
+    );
+  } else {
+    await query(
+      `INSERT INTO users (id, name, email)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         name = VALUES(name),
+         email = VALUES(email)`,
+      [id, name, email]
+    );
+  }
   return true;
 }
 
@@ -43,13 +54,22 @@ export async function ensureUserSettings(userId, settings) {
   const darkMode = settings?.darkMode !== undefined ? Boolean(settings?.darkMode) : true;
   const twoFactor = Boolean(settings?.twoFactor);
 
-  await query(
-    `INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor)
-     VALUES (?, ?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-       user_id = user_id`,
-    [userId, currency, monthlyGoal, emailNotif, darkMode, twoFactor]
-  );
+  if (getDialect() === 'postgres') {
+    await query(
+      `INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT (user_id) DO NOTHING`,
+      [userId, currency, monthlyGoal, emailNotif, darkMode, twoFactor]
+    );
+  } else {
+    await query(
+      `INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor)
+       VALUES (?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         user_id = user_id`,
+      [userId, currency, monthlyGoal, emailNotif, darkMode, twoFactor]
+    );
+  }
   return true;
 }
 
@@ -96,8 +116,12 @@ export async function getTransactionById(id) {
 }
 
 export async function createTransaction(userId, data) {
+  const sql = getDialect() === 'postgres'
+    ? 'INSERT INTO transactions (user_id, type, description, category, amount, currency, occurred_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id'
+    : 'INSERT INTO transactions (user_id, type, description, category, amount, currency, occurred_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
+
   const result = await query(
-    'INSERT INTO transactions (user_id, type, description, category, amount, currency, occurred_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    sql,
     [userId, data.type, data.description, data.category, data.amount, data.currency, data.occurredAt]
   );
   return result?.insertId || null;
@@ -144,8 +168,12 @@ export async function getGoals(userId) {
 }
 
 export async function createGoal(userId, data) {
+  const sql = getDialect() === 'postgres'
+    ? 'INSERT INTO goals (user_id, name, target_amount, saved_amount, currency) VALUES (?, ?, ?, ?, ?) RETURNING id'
+    : 'INSERT INTO goals (user_id, name, target_amount, saved_amount, currency) VALUES (?, ?, ?, ?, ?)';
+
   const result = await query(
-    'INSERT INTO goals (user_id, name, target_amount, saved_amount, currency) VALUES (?, ?, ?, ?, ?)',
+    sql,
     [userId, data.name, data.targetAmount, data.savedAmount || 0, data.currency]
   );
   return result?.insertId || null;
@@ -179,14 +207,23 @@ export async function getUserSettings(userId) {
 
 export async function updateUserSettings(userId, settings) {
   const result = await query(
-    `INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor)
-     VALUES (?, ?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-     currency = VALUES(currency),
-     monthly_goal = VALUES(monthly_goal),
-     email_notif = VALUES(email_notif),
-     dark_mode = VALUES(dark_mode),
-     two_factor = VALUES(two_factor)`,
+    getDialect() === 'postgres'
+      ? `INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor)
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON CONFLICT (user_id) DO UPDATE SET
+           currency = EXCLUDED.currency,
+           monthly_goal = EXCLUDED.monthly_goal,
+           email_notif = EXCLUDED.email_notif,
+           dark_mode = EXCLUDED.dark_mode,
+           two_factor = EXCLUDED.two_factor`
+      : `INSERT INTO user_settings (user_id, currency, monthly_goal, email_notif, dark_mode, two_factor)
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+         currency = VALUES(currency),
+         monthly_goal = VALUES(monthly_goal),
+         email_notif = VALUES(email_notif),
+         dark_mode = VALUES(dark_mode),
+         two_factor = VALUES(two_factor)`,
     [userId, settings.currency, settings.monthlyGoal, settings.emailNotif, settings.darkMode, settings.twoFactor]
   );
   return result !== null;

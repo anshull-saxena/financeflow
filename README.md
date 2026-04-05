@@ -33,12 +33,15 @@ http://localhost:3001
 ### Option 1: In-Memory (Default - No Setup)
 Perfect for development and demos. Data resets on server restart.
 
-### Option 2: Cloud MySQL (Persistent)
-Set a managed MySQL connection string:
+### Option 2: Cloud SQL (Persistent)
+Set a managed SQL connection string (`mysql://...` or `postgres://...`):
 
 ```bash
-# Example (PlanetScale/Aiven/RDS-compatible MySQL URL)
+# Example MySQL
 DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/financeflow
+
+# Example PostgreSQL (Neon/Supabase/RDS)
+DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/financeflow
 DB_SSL=true
 ```
 
@@ -159,7 +162,7 @@ node src/full-server.mjs
 ## 🚢 Deployment
 
 ### With Cloud SQL (Recommended for production)
-1. Create a managed MySQL database (PlanetScale, Aiven, RDS, etc.)
+1. Create a managed SQL database (MySQL or PostgreSQL)
 2. Add `DATABASE_URL` in your hosting provider (Vercel/Render/Railway)
 3. Set `DB_SSL=true` if your provider requires TLS
 4. Redeploy/start server (migrations run automatically)
@@ -189,6 +192,7 @@ Create `server/.env`:
 ```env
 # Preferred for cloud SQL:
 DATABASE_URL=mysql://USER:PASSWORD@HOST:3306/financeflow
+# or: DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/financeflow
 DB_SSL=true
 
 # Or use discrete DB_* variables:

@@ -28,9 +28,9 @@ app.use('/static', express.static(path.join(__dirname, '../../financeflow')));
 (async () => {
   const pool = await getPool();
   if (pool) {
-    console.log('📊 Using MySQL database for data persistence');
+    console.log('📊 Using SQL database for data persistence');
   } else {
-    console.log('💾 Using in-memory storage (set DATABASE_URL or run ./setup-mysql.sh to enable MySQL)');
+    console.log('💾 Using in-memory storage (set DATABASE_URL or run ./setup-mysql.sh to enable SQL persistence)');
   }
 })();
 
