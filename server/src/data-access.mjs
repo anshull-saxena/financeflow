@@ -239,11 +239,17 @@ export async function getTransactionStats(userId = '1') {
     const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     
     const monthIncome = transactions
-      .filter(t => t.type === 'income' && (t.occurredAt || t.date).startsWith(monthKey))
+      .filter(t => {
+        const dateStr = t.occurredAt instanceof Date ? t.occurredAt.toISOString() : String(t.occurredAt || t.date);
+        return t.type === 'income' && dateStr.startsWith(monthKey);
+      })
       .reduce((sum, t) => sum + t.amount, 0);
     
     const monthExpenses = transactions
-      .filter(t => t.type === 'expense' && (t.occurredAt || t.date).startsWith(monthKey))
+      .filter(t => {
+        const dateStr = t.occurredAt instanceof Date ? t.occurredAt.toISOString() : String(t.occurredAt || t.date);
+        return t.type === 'expense' && dateStr.startsWith(monthKey);
+      })
       .reduce((sum, t) => sum + t.amount, 0);
     
     monthlyData.push({
@@ -255,7 +261,10 @@ export async function getTransactionStats(userId = '1') {
 
   // Calculate weekly trend for current month
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  const monthTransactions = transactions.filter(t => (t.occurredAt || t.date).startsWith(currentMonth));
+  const monthTransactions = transactions.filter(t => {
+    const dateStr = t.occurredAt instanceof Date ? t.occurredAt.toISOString() : String(t.occurredAt || t.date);
+    return dateStr.startsWith(currentMonth);
+  });
   
   const weeklyTrend = [];
   for (let week = 0; week < 4; week++) {
@@ -304,7 +313,10 @@ export async function getTransactionStats(userId = '1') {
   const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonthKey = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}`;
   const lastMonthIncome = transactions
-    .filter(t => t.type === 'income' && (t.occurredAt || t.date).startsWith(lastMonthKey))
+    .filter(t => {
+      const dateStr = t.occurredAt instanceof Date ? t.occurredAt.toISOString() : String(t.occurredAt || t.date);
+      return t.type === 'income' && dateStr.startsWith(lastMonthKey);
+    })
     .reduce((sum, t) => sum + t.amount, 0);
   
   const incomeGrowth = lastMonthIncome > 0 
