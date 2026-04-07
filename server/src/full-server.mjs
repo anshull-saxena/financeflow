@@ -35,7 +35,7 @@ app.use('/static', express.static(path.join(__dirname, '../../financeflow')));
 })();
 
 // Routes - Serve pages (Premium Frontend from site/public)
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/dashboard.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/index.html')));
 app.get('/expenses', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/expenses.html')));
 app.get('/income', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/income.html')));
 app.get('/settings', (req, res) => res.sendFile(path.join(__dirname, '../../site/public/settings.html')));
