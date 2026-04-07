@@ -183,8 +183,7 @@
             API.setToken(req.token);
             
             // Onboarding check happens via existence of profile name in localStorage, but since we are server-backed we route to dashboard safely.
-            const hasProfile = !!localStorage.getItem('ff_userName');
-            window.location.href = hasProfile ? 'dashboard.html' : 'onboarding.html';
+            window.location.href = 'dashboard.html';
         } catch(error) {
             window.showAppAlert(error.message || 'Invalid credentials');
         } finally {
