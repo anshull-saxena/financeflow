@@ -26,13 +26,19 @@
       })();
     </script>
   </head>
-  <body class="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
-    <div class="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+  <body class="min-h-screen bg-slate-950 text-slate-100 p-6 overflow-y-auto">
+    <div class="w-full max-w-md mx-auto my-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
       <div class="mb-8">
         <h1 class="text-3xl font-black tracking-tight text-white">Create your account</h1>
         <p class="text-slate-400 mt-2 text-sm">
           Basic signup (demo mode). Your profile is stored locally on this device.
         </p>
+        <div class="mt-4 p-3 rounded-lg bg-cyan-400/10 border border-cyan-400/20">
+          <p class="text-cyan-400 text-xs font-semibold">💡 Demo Tip</p>
+          <p class="text-slate-300 text-xs mt-1">
+            Or use demo login: <span class="text-white font-mono">demo@financeflow.local</span> / <span class="text-white font-mono">demo123</span>
+          </p>
+        </div>
       </div>
 
       <form id="signupForm" class="space-y-4">
