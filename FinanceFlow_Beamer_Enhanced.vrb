@@ -1,0 +1,25 @@
+\frametitle{Project Structure}
+\scriptsize
+\begin{lstlisting}
+financeflow/
+|-- financeflow/                # Frontend (Vanilla JS + Tailwind)
+|   |-- dashboard/             # Dashboard page
+|   |-- income_page/           # Income tracking
+|   |-- expenses_page/         # Expense management
+|   |-- reports_analytics/     # Analytics + Chart.js
+|   |-- settings/              # User settings
+|   |-- auth/                  # Login & Signup
+|   +-- shared/                # financeflow.js, darkmode.js, toast.js
+|
+|-- server/                     # Backend (Node.js + Express)
+|   |-- src/
+|   |   |-- full-server.mjs    # Main Express server
+|   |   |-- data-access.mjs    # Hybrid data layer (MySQL/PG/Memory)
+|   |   |-- db/                # connection, queries, migrations
+|   |   |-- routes/            # API route handlers
+|   |   +-- services/          # Business logic (TypeScript)
+|   +-- migrations/001_init.sql
+|
+|-- api/index.js                # Vercel serverless wrapper
++-- vercel.json                 # Deployment config
+\end{lstlisting}
